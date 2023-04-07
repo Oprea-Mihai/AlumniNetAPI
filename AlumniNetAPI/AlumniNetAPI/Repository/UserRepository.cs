@@ -1,5 +1,7 @@
 ﻿using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 
 namespace AlumniNetAPI.Repository
 {
@@ -7,6 +9,12 @@ namespace AlumniNetAPI.Repository
     {
         public UserRepository(AlumniNetAppContext context) : base(context)
         {
+        }
+
+        public async Task<User>GetUserByIdAsync(int id)
+        {
+            User user = await _dbSet.SingleAsync(u=>u.UserId==id);
+            return user;
         }
     }
 }
