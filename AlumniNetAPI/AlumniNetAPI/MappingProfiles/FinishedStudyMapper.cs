@@ -8,8 +8,10 @@ namespace AlumniNetAPI.MappingProfiles
     {
         public FinishedStudyMapper()
         {
+            CreateMap<FinishedStudy, FinishedStudyDetailedDTO>();
             CreateMap<FinishedStudy, FinishedStudyDTO>();
             CreateMap<FinishedStudyDTO, FinishedStudy>();
+            CreateMap<FinishedStudyDetailedDTO, FinishedStudy>();
         }
     }
 }

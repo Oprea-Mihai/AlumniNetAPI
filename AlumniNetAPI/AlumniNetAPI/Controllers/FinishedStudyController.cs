@@ -3,6 +3,7 @@ using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlumniNetAPI.Controllers
 {
@@ -23,7 +24,7 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                FinishedStudyDTO study =_mapper.Map<FinishedStudy,FinishedStudyDTO> 
+                FinishedStudyDetailedDTO study =_mapper.Map<FinishedStudy,FinishedStudyDetailedDTO> 
                     (await _unitOfWork.FinishedStudyRepository.GetFinishedStudyByIdAsync(id));
                 return Ok(study);
             }
@@ -61,6 +62,24 @@ namespace AlumniNetAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpPut("UpdateFinishedStudy")]
+        public async Task<IActionResult>UpdateFinishedStudySpecialization(FinishedStudyDTO finishedStudy)
+        {
+            try
+            {
+                FinishedStudy updated = _mapper.Map<FinishedStudyDTO, FinishedStudy>(finishedStudy);
+                await _unitOfWork.FinishedStudyRepository.UpdateAsync(updated);
+                await _unitOfWork.CompleteAsync();
+                return Ok(updated);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
     }
 }
