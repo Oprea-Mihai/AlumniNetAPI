@@ -1,4 +1,5 @@
-﻿using AlumniNetAPI.Models;
+﻿using AlumniNetAPI.DTOs;
+using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,8 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                FinishedStudy study = await _unitOfWork.FinishedStudyRepository.GetFinishedStudyByIdAsync(id);
+                FinishedStudyDTO study =_mapper.Map<FinishedStudy,FinishedStudyDTO> 
+                    (await _unitOfWork.FinishedStudyRepository.GetFinishedStudyByIdAsync(id));
                 return Ok(study);
             }
             catch (Exception ex)
@@ -33,10 +35,12 @@ namespace AlumniNetAPI.Controllers
 
 
         [HttpGet("GetFinishedStudyByUserId")]
-        public async Task<IActionResult> GetFinishedStudyByUserId()
+        public async Task<IActionResult> GetFinishedStudyByUserId(int id)
         {
             try
             {
+                int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(id)).ProfileId;
+                List<FinishedStudy> study=(await _unitOfWork.FinishedStudyRepository.GetAllAsync()).Where(x=>x.ProfileId==profileId).ToList();
                 return Ok();
             }
             catch (Exception ex)

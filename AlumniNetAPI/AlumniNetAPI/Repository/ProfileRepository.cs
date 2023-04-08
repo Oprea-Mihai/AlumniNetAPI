@@ -15,10 +15,6 @@ namespace AlumniNetAPI.Repository
             return profile;
         }
 
-        public async Task<Profile> GetProfileByUserIdAsync(int id)
-        {
-            Profile profile = await _dbSet.SingleAsync(p => p.UserId == id);
-            return profile;
-        }
+        
     }
 }

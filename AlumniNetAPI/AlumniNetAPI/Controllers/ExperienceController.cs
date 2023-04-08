@@ -40,7 +40,7 @@ namespace AlumniNetAPI.Controllers
             try
             {
                 Experience expMapping = _mapper.Map<ExperienceDTO, Experience>(experience);
-                expMapping.ProfileId = (await _unitOfWork.ProfileRepository.GetProfileByUserIdAsync(userId)).ProfileId;
+                expMapping.ProfileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
                 await _unitOfWork.ExperienceRepository.AddAsync(expMapping);
                 await _unitOfWork.CompleteAsync();
                 return Ok(expMapping);
@@ -56,7 +56,7 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                int profileId= (await _unitOfWork.ProfileRepository.GetProfileByUserIdAsync(userId)).ProfileId;
+                int profileId= (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
                 List<Experience> experiences = new List<Experience>();
                 experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
 

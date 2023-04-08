@@ -24,7 +24,8 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByUserIdAsync(userId));
+                int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
+                ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByIdAsync(profileId));
                 return Ok(profileMapping);
             }
             catch (Exception ex)
@@ -34,11 +35,12 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPut("UpdateProfileByUserId")]
-        public async Task<IActionResult> UpdateProfileByUserId(ProfileDTO profile)
+        public async Task<IActionResult> UpdateProfileByUserId(ProfileDTO profile,int userId)
         {
             try
             {
-                Profile profileToUpdate = await _unitOfWork.ProfileRepository.GetProfileByUserIdAsync(profile.UserId);
+                int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
+                Profile profileToUpdate = await _unitOfWork.ProfileRepository.GetProfileByIdAsync(profileId);
                 profileToUpdate.Description=profile.Description;
                 profileToUpdate.ProfilePicture = profile.ProfilePicture;
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);

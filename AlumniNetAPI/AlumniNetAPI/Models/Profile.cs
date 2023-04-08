@@ -7,8 +7,6 @@ public partial class Profile
 {
     public int ProfileId { get; set; }
 
-    public int UserId { get; set; }
-
     public string? ProfilePicture { get; set; }
 
     public string? Description { get; set; }
@@ -17,5 +15,5 @@ public partial class Profile
 
     public virtual ICollection<FinishedStudy> FinishedStudies { get; } = new List<FinishedStudy>();
 
-    public virtual User User { get; set; } = null!;
+    public virtual ICollection<User> Users { get; } = new List<User>();
 }

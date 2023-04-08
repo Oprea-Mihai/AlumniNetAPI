@@ -19,7 +19,9 @@ public partial class User
 
     public string? FirebaseAuthToken { get; set; }
 
+    public int ProfileId { get; set; }
+
     public virtual ICollection<Post> Posts { get; } = new List<Post>();
 
-    public virtual ICollection<Profile> Profiles { get; } = new List<Profile>();
+    public virtual Profile Profile { get; set; } = null!;
 }

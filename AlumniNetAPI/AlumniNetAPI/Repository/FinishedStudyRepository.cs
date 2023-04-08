@@ -12,13 +12,19 @@ namespace AlumniNetAPI.Repository
 
         public async Task<FinishedStudy> GetFinishedStudyByIdAsync(int id)
         {
-            FinishedStudy study = await _dbSet.SingleAsync(s => s.FinishedStudyId == id);
+            FinishedStudy study = await _dbSet.Include(fs => fs.LearningSchedule)
+        .Include(fs => fs.Profile)
+        .Include(fs => fs.Specialization).ThenInclude(s => s.Faculty)
+        .Include(fs => fs.StudyProgram).SingleAsync(s => s.FinishedStudyId == id);
             return study;
         }
 
         public async Task<FinishedStudy> GetFinishedStudyByProfileIdAsync(int id)
         {
-            FinishedStudy study = await _dbSet.SingleAsync(s => s.ProfileId == id);
+            FinishedStudy study = await _dbSet.Include(fs => fs.LearningSchedule)
+        .Include(fs => fs.Profile)
+        .Include(fs => fs.Specialization)
+        .Include(fs => fs.StudyProgram).SingleAsync(s => s.ProfileId == id);
             return study;
         }
 
