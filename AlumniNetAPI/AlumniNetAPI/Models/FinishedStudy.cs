@@ -7,7 +7,7 @@ public partial class FinishedStudy
 {
     public int FinishedStudyId { get; set; }
 
-    public int SpecializationId { get; set; }
+    public int? SpecializationId { get; set; }
 
     public int LearningScheduleId { get; set; }
 
@@ -21,7 +21,7 @@ public partial class FinishedStudy
 
     public virtual Profile Profile { get; set; } = null!;
 
-    public virtual Specialization Specialization { get; set; } = null!;
+    public virtual Specialization? Specialization { get; set; }
 
     public virtual StudyProgram StudyProgram { get; set; } = null!;
 }

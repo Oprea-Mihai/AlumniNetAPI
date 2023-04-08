@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
+using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Data;
 
 namespace AlumniNetAPI.Models;
 
@@ -10,10 +14,13 @@ public partial class AlumniNetAppContext : DbContext
     {
     }
 
-    public AlumniNetAppContext(DbContextOptions<AlumniNetAppContext> options)
-        : base(options)
+
+    public AlumniNetAppContext(DbContextOptions<AlumniNetAppContext> options, IConfiguration configuration) : base(options)
     {
+        _configuration = configuration;
+        DbConnection = new SqlConnection(this._configuration.GetConnectionString("MyContext"));
     }
+
 
     public virtual DbSet<Experience> Experiences { get; set; }
 
@@ -34,8 +41,14 @@ public partial class AlumniNetAppContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-1UAVMPK;Database=AlumniNetApp;Trusted_Connection=True;Trust Server Certificate=true");
+    {
+        try
+        { optionsBuilder.UseSqlServer(DbConnection.ConnectionString); }
+        catch (Exception e) { throw new Exception(e.Message); }
+    }
+
+    private readonly IConfiguration? _configuration;
+    private IDbConnection DbConnection { get; } = new SqlConnection();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,11 +59,9 @@ public partial class AlumniNetAppContext : DbContext
             entity.Property(e => e.CompanyName)
                 .HasMaxLength(255)
                 .IsUnicode(false);
-            entity.Property(e => e.EndDate).HasColumnType("date");
             entity.Property(e => e.JobTitle)
                 .HasMaxLength(255)
                 .IsUnicode(false);
-            entity.Property(e => e.StartDate).HasColumnType("date");
 
             entity.HasOne(d => d.Profile).WithMany(p => p.Experiences)
                 .HasForeignKey(d => d.ProfileId)
@@ -83,7 +94,6 @@ public partial class AlumniNetAppContext : DbContext
 
             entity.HasOne(d => d.Specialization).WithMany(p => p.FinishedStudies)
                 .HasForeignKey(d => d.SpecializationId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FinishedStudy_Specialization");
 
             entity.HasOne(d => d.StudyProgram).WithMany(p => p.FinishedStudies)

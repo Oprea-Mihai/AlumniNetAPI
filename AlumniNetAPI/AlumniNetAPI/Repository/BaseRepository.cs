@@ -36,5 +36,6 @@ namespace AlumniNetAPI.Repository
             _context.Update(entity);
             return Task.CompletedTask;
         }
+
     }
 }

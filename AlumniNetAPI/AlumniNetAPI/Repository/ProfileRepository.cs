@@ -1,5 +1,6 @@
 ﻿using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlumniNetAPI.Repository
 {
@@ -7,6 +8,17 @@ namespace AlumniNetAPI.Repository
     {
         public ProfileRepository(AlumniNetAppContext context) : base(context)
         {
+        }
+        public async Task<Profile> GetProfileByIdAsync(int id)
+        {
+            Profile profile = await _dbSet.SingleAsync(p => p.ProfileId == id);
+            return profile;
+        }
+
+        public async Task<Profile> GetProfileByUserIdAsync(int id)
+        {
+            Profile profile = await _dbSet.SingleAsync(p => p.UserId == id);
+            return profile;
         }
     }
 }
