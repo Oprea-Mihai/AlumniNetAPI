@@ -2,6 +2,7 @@
 using AlumniNetAPI.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AlumniNetAPI.Repository
 {
@@ -20,6 +21,12 @@ namespace AlumniNetAPI.Repository
         public async Task<User> GetUserWithProfileByIdAsync(int id)
         {
             User user = await _dbSet.Include(u=>u.Profile).SingleAsync(u => u.UserId == id);
+            return user;
+        }
+
+        public async Task<User> GetUserByAuthTokenAsync(string token)
+        {
+            User user = await _dbSet.Include(u => u.Profile).SingleAsync(u => u.FirebaseAuthToken == token);
             return user;
         }
     }

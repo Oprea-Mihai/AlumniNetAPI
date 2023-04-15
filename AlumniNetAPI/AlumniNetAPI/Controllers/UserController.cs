@@ -46,6 +46,21 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [HttpGet("GetUserByAuthToken")]
+        public async Task<IActionResult> GetUserByAuthToken(string token)
+        {
+            try
+            {
+                User user = await _unitOfWork.UserRepository.GetUserByAuthTokenAsync(token);
+                UserDTO dto = _mapper.Map<User,UserDTO>(user);
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("AddUser")]
         public async Task<IActionResult> AddUser([FromBody] UserDTO newUser)
         {
