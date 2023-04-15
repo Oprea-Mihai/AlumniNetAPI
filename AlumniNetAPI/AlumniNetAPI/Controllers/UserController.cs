@@ -47,7 +47,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPost("AddUser")]
-        public async Task<IActionResult> AddUser(UserDTO newUser)
+        public async Task<IActionResult> AddUser([FromBody] UserDTO newUser)
         {
             try
             {
