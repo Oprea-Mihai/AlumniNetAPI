@@ -1,5 +1,6 @@
 ﻿using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlumniNetAPI.Repository
 {
@@ -7,6 +8,11 @@ namespace AlumniNetAPI.Repository
     {
         public StudyProgramRepository(AlumniNetAppContext context) : base(context)
         {
+        }
+        public async Task<StudyProgram> GetStudyProgramByIdAsync(int id)
+        {
+            StudyProgram studyProgram = await _dbSet.SingleAsync(s => s.StudyProgramId == id);
+            return studyProgram;
         }
     }
 }
