@@ -1,5 +1,7 @@
-﻿using AlumniNetAPI.Models;
+﻿using AlumniNetAPI.DTOs;
+using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
@@ -8,10 +10,12 @@ namespace AlumniNetAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public UserController(IUnitOfWork unitOfWork)
+        public UserController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [HttpGet("GetAllUsers")]
@@ -42,6 +46,22 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [HttpPost("AddUser")]
+        public async Task<IActionResult> AddUser(UserDTO newUser)
+        {
+            try
+            {
+                User user = _mapper.Map<UserDTO, User>(newUser);
+                user.Profile = new Models.Profile();
+                await _unitOfWork.UserRepository.AddAsync(user);
+                await _unitOfWork.CompleteAsync();
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

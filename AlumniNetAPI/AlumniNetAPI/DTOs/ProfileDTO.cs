@@ -6,8 +6,6 @@ namespace AlumniNetAPI.DTOs
     {
         public int ProfileId { get; set; }
 
-        public int UserId { get; set; }
-
         public string? ProfilePicture { get; set; }
 
         public string? Description { get; set; }       
