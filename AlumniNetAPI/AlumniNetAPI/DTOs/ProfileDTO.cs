@@ -10,7 +10,6 @@ namespace AlumniNetAPI.DTOs
 
         public string? ProfilePicture { get; set; }
 
-        public string? Description { get; set; }
-       
+        public string? Description { get; set; }       
     }
 }

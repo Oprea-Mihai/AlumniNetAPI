@@ -39,10 +39,45 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
-                Profile profileToUpdate = await _unitOfWork.ProfileRepository.GetProfileByIdAsync(profileId);
+                Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).Profile;
                 profileToUpdate.Description=profile.Description;
                 profileToUpdate.ProfilePicture = profile.ProfilePicture;
+                await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok(profileToUpdate);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("UpdateProfilePictureByUserId")]
+        public async Task<IActionResult> UpdateProfilePictureByUserId(string profilePicture, int userId)
+        {
+            try
+            {
+               
+                Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
+                profileToUpdate.ProfilePicture = profilePicture;
+                await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok(profileToUpdate);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("UpdateProfileDescriptionByUserId")]
+        public async Task<IActionResult> UpdateProfileDescriptionByUserId(string profileDescription, int userId)
+        {
+            try
+            {
+
+                Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
+                profileToUpdate.Description = profileDescription;
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
                 await _unitOfWork.CompleteAsync();
                 return Ok(profileToUpdate);
