@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
 {
+    [Route("api/[controller]")]
     public class StudyProgramController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
