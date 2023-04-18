@@ -5,7 +5,7 @@ namespace AlumniNetAPI.Models;
 
 public partial class User
 {
-    public int UserId { get; set; }
+    public string UserId { get; set; } = null!;
 
     public string FirstName { get; set; } = null!;
 
@@ -16,8 +16,6 @@ public partial class User
     public string? Email { get; set; }
 
     public string? Password { get; set; }
-
-    public string? FirebaseAuthToken { get; set; }
 
     public int ProfileId { get; set; }
 

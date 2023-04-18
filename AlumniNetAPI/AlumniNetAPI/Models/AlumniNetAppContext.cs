@@ -1,19 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace AlumniNetAPI.Models;
 
 public partial class AlumniNetAppContext : DbContext
 {
+    private readonly IConfiguration? _configuration;
+    private IDbConnection DbConnection { get; } = new SqlConnection();
+
     public AlumniNetAppContext()
     {
     }
 
-    public AlumniNetAppContext(DbContextOptions<AlumniNetAppContext> options)
-        : base(options)
+    public AlumniNetAppContext(DbContextOptions<AlumniNetAppContext> options, IConfiguration configuration) : base(options)
     {
+        _configuration = configuration;
+        DbConnection = new SqlConnection(this._configuration.GetConnectionString("MyContext"));
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        try
+        { optionsBuilder.UseSqlServer(DbConnection.ConnectionString); }
+        catch (Exception e) { throw new Exception(e.Message); }
+    }
+
 
     public virtual DbSet<Experience> Experiences { get; set; }
 
@@ -105,6 +119,9 @@ public partial class AlumniNetAppContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.UserId)
+                .HasMaxLength(250)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.User).WithMany(p => p.Posts)
                 .HasForeignKey(d => d.UserId)
@@ -140,20 +157,20 @@ public partial class AlumniNetAppContext : DbContext
             entity.ToTable("StudyProgram");
 
             entity.Property(e => e.ProgramName)
-                .HasMaxLength(30)
-                .IsFixedLength();
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("User");
 
+            entity.Property(e => e.UserId)
+                .HasMaxLength(250)
+                .IsUnicode(false);
             entity.Property(e => e.Email)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.FirebaseAuthToken)
-                .HasMaxLength(255)
-                .IsFixedLength();
             entity.Property(e => e.FirstName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
