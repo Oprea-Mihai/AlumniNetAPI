@@ -21,24 +21,6 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("Hello")]
-        public async Task<IActionResult> Hello()
-        {
-            try
-            {
-                var userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-                var userName = User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
-
-                await Task.Delay(100);
-                return Ok("Hello!!!");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [Authorize]
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
