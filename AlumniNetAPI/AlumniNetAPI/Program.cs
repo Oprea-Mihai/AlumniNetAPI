@@ -1,23 +1,28 @@
-using AlumniNetAPI.Repository.Interfaces;
-using AlumniNetAPI.Repository;
-using Microsoft.EntityFrameworkCore;
 using AlumniNetAPI.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication;
+using AlumniNetAPI.Repository;
+using AlumniNetAPI.Repository.Interfaces;
 using FirebaseAdmin;
-using AlumniNetAPI.Authentication;
+using FirebaseAdminAuthentication.DependencyInjection.Extensions;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddSingleton(FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromJson(builder.Configuration.GetValue<string>("FIREBASE-CONFIG"))
+}));
+
+builder.Services.AddFirebaseAuthentication();
+
+builder.Services.AddAuthorization();
+
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-//builder.Services.AddSingleton(FirebaseApp.Create());
-
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>
-//    (JwtBearerDefaults.AuthenticationScheme, (o) => { });
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -26,6 +31,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+
 
 builder.Services.AddDbContext<AlumniNetAppContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MyContext")));
 
@@ -44,9 +50,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

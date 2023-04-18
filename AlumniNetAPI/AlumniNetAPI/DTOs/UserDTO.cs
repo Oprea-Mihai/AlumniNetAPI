@@ -2,11 +2,11 @@
 {
     public class UserDTO
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
-        public string FirstName { get; set; } = null!;
+        public string? FirstName { get; set; }
 
-        public string LastName { get; set; } = null!;
+        public string? LastName { get; set; }
 
         public bool IsValid { get; set; }
 

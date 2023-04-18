@@ -4,6 +4,7 @@ using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AlumniNetAPI.Controllers
 {
@@ -19,16 +20,34 @@ namespace AlumniNetAPI.Controllers
             _mapper = mapper;
         }
 
-        //[Authorize]
+        [Authorize]
+        [HttpGet("Hello")]
+        public async Task<IActionResult> Hello()
+        {
+            try
+            {
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                var userName = User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+
+                await Task.Delay(100);
+                return Ok("Hello!!!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
             {
-                List<User>users= (await _unitOfWork.UserRepository.GetAllAsync()).ToList();
-                List<UserDTO> mappedUsers = _mapper.Map<List<User>, List<UserDTO>>(users);
+                var users= (await _unitOfWork.UserRepository.GetAllAsync()).ToList();
+                List<UserDTO> mappedUsers = _mapper.Map<List<User>, List<UserDTO>>(users.ToList());
 
-                return Ok(mappedUsers);
+                return Ok(users);
             }
             catch (Exception ex)
             {
