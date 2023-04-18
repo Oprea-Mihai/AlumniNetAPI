@@ -13,11 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddSingleton(FirebaseApp.Create());
+//builder.Services.AddSingleton(FirebaseApp.Create());
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>
-    (JwtBearerDefaults.AuthenticationScheme, (o) => { });
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>
+//    (JwtBearerDefaults.AuthenticationScheme, (o) => { });
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
