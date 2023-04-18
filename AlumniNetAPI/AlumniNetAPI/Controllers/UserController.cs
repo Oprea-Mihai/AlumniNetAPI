@@ -2,6 +2,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
@@ -18,13 +19,16 @@ namespace AlumniNetAPI.Controllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
             {
-                var users = await _unitOfWork.UserRepository.GetAllAsync();
-                return Ok(users);
+                List<User>users= (await _unitOfWork.UserRepository.GetAllAsync()).ToList();
+                List<UserDTO> mappedUsers = _mapper.Map<List<User>, List<UserDTO>>(users);
+
+                return Ok(mappedUsers);
             }
             catch (Exception ex)
             {
@@ -33,7 +37,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpGet("GetUserById")]
-        public async Task<IActionResult> GetUserById(int id)
+        public async Task<IActionResult> GetUserById(string id)
         {
             try
             {
@@ -51,9 +55,9 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                User user = await _unitOfWork.UserRepository.GetUserByAuthTokenAsync(token);
-                UserDTO dto = _mapper.Map<User,UserDTO>(user);
-                return Ok(dto);
+                //User user = await _unitOfWork.UserRepository.GetUserByAuthTokenAsync(token);
+                //UserDTO dto = _mapper.Map<User,UserDTO>(user);
+                return Ok();
             }
             catch (Exception ex)
             {

@@ -2,6 +2,10 @@ using AlumniNetAPI.Repository.Interfaces;
 using AlumniNetAPI.Repository;
 using Microsoft.EntityFrameworkCore;
 using AlumniNetAPI.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
+using FirebaseAdmin;
+using AlumniNetAPI.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddSingleton(FirebaseApp.Create());
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>
+    (JwtBearerDefaults.AuthenticationScheme, (o) => { });
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -36,6 +45,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseAuthentication();
 
 app.MapControllers();
 

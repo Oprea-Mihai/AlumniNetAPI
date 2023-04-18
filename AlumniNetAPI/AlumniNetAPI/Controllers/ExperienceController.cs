@@ -35,7 +35,7 @@ namespace AlumniNetAPI.Controllers
 
 
         [HttpPost("AddNewExperienceForUser")]
-        public async Task<IActionResult> AddNewExperienceForUser(ExperienceDTO experience, int userId)
+        public async Task<IActionResult> AddNewExperienceForUser(ExperienceDTO experience, string userId)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpGet("GetAllExperiencesForUser")]
-        public async Task<IActionResult> GetAllExperiencesForUser(int userId)
+        public async Task<IActionResult> GetAllExperiencesForUser(string userId)
         {
             try
             {

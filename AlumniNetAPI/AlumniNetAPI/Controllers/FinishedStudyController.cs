@@ -36,7 +36,7 @@ namespace AlumniNetAPI.Controllers
 
 
         [HttpGet("GetFinishedStudyByUserId")]
-        public async Task<IActionResult> GetFinishedStudyByUserId(int id)
+        public async Task<IActionResult> GetFinishedStudyByUserId(string id)
         {
             try
             {

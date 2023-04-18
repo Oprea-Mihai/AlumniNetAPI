@@ -20,7 +20,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpGet("GetProfileByUserId")]
-        public async Task<IActionResult> GetProfileByUserId(int userId)
+        public async Task<IActionResult> GetProfileByUserId(string userId)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPut("UpdateProfileByUserId")]
-        public async Task<IActionResult> UpdateProfileByUserId(ProfileDTO profile,int userId)
+        public async Task<IActionResult> UpdateProfileByUserId(ProfileDTO profile, string userId)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPut("UpdateProfilePictureByUserId")]
-        public async Task<IActionResult> UpdateProfilePictureByUserId(string profilePicture, int userId)
+        public async Task<IActionResult> UpdateProfilePictureByUserId(string profilePicture, string userId)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPut("UpdateProfileDescriptionByUserId")]
-        public async Task<IActionResult> UpdateProfileDescriptionByUserId(string profileDescription, int userId)
+        public async Task<IActionResult> UpdateProfileDescriptionByUserId(string profileDescription, string userId)
         {
             try
             {
