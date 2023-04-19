@@ -2,6 +2,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,15 +35,20 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
-
+        //[Authorize]
         [HttpGet("GetFinishedStudyByUserId")]
-        public async Task<IActionResult> GetFinishedStudyByUserId(string id)
+        public async Task<IActionResult> GetFinishedStudyByUserId(string userId)
         {
             try
             {
-                int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(id)).ProfileId;
-                List<FinishedStudy> study=(await _unitOfWork.FinishedStudyRepository.GetAllAsync()).Where(x=>x.ProfileId==profileId).ToList();
-                return Ok();
+                //string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
+
+                List<FinishedStudy> studies=(await _unitOfWork.FinishedStudyRepository.GetAllDetailed())
+                    .Where(x=>x.ProfileId==profileId).ToList();
+
+                List<FinishedStudyDetailedDTO> studiesDTO = _mapper.Map<List<FinishedStudy>, List<FinishedStudyDetailedDTO>>(studies);
+                return Ok(studiesDTO);
             }
             catch (Exception ex)
             {

@@ -6,5 +6,6 @@ namespace AlumniNetAPI.Repository.Interfaces
     {
         Task<FinishedStudy> GetFinishedStudyByIdAsync(int id);
         Task<FinishedStudy> GetFinishedStudyByProfileIdAsync(int id);
+        Task<List<FinishedStudy>> GetAllDetailed();
     }
 }

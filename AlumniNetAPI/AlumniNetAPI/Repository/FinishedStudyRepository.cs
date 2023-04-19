@@ -19,6 +19,15 @@ namespace AlumniNetAPI.Repository
             return study;
         }
 
+        public async Task<List<FinishedStudy>> GetAllDetailed()
+        {
+           List<FinishedStudy> study = await _dbSet.Include(fs => fs.LearningSchedule)
+      .Include(fs => fs.Profile)
+      .Include(fs => fs.Specialization).ThenInclude(s => s.Faculty)
+      .Include(fs => fs.StudyProgram).ToListAsync();
+            return study;
+        }
+
         public async Task<FinishedStudy> GetFinishedStudyByProfileIdAsync(int id)
         {
             FinishedStudy study = await _dbSet.Include(fs => fs.LearningSchedule)

@@ -37,12 +37,14 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("GetUserById")]
-        public async Task<IActionResult> GetUserById(string id)
+        public async Task<IActionResult> GetUserById()
         {
             try
             {
-                User user = await _unitOfWork.UserRepository.GetUserByIdAsync(id);
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                User user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
                 return Ok(user);
             }
             catch (Exception ex)
@@ -51,21 +53,9 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
-        [HttpGet("GetUserByAuthToken")]
-        public async Task<IActionResult> GetUserByAuthToken(string token)
-        {
-            try
-            {
-                //User user = await _unitOfWork.UserRepository.GetUserByAuthTokenAsync(token);
-                //UserDTO dto = _mapper.Map<User,UserDTO>(user);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        
 
+        [Authorize]
         [HttpPost("AddUser")]
         public async Task<IActionResult> AddUser([FromBody] UserDTO newUser)
         {

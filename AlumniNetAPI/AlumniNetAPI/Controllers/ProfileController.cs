@@ -2,7 +2,9 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using Profile = AlumniNetAPI.Models.Profile;
 
 namespace AlumniNetAPI.Controllers
@@ -19,14 +21,39 @@ namespace AlumniNetAPI.Controllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet("GetProfileByUserId")]
-        public async Task<IActionResult> GetProfileByUserId(string userId)
+        public async Task<IActionResult> GetProfileByUserId()
         {
             try
             {
-                int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
-                ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByIdAsync(profileId));
-                return Ok(profileMapping);
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+                UserDTO user = _mapper.Map<User,UserDTO>(await _unitOfWork.UserRepository.GetUserByIdAsync(userId));
+                ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByIdAsync(user.ProfileId));
+                EntireProfileDTO entireProfileDTO = new EntireProfileDTO();
+
+                entireProfileDTO.Description = profileMapping.Description;
+                entireProfileDTO.ProfilePicture= profileMapping.ProfilePicture;
+                entireProfileDTO.FirstName = user.FirstName;
+                entireProfileDTO.LastName = user.LastName;
+                entireProfileDTO.Email = user.Email;
+                entireProfileDTO.IsValid = user.IsValid;
+
+                List<Experience> experiences = new List<Experience>();
+                experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
+
+                entireProfileDTO.Experiences=_mapper.Map<List<Experience>, List<ExperienceDTO>>
+                    (experiences.Where(exp => exp.ProfileId == user.ProfileId).ToList());
+
+
+                List<FinishedStudy> studies = new List<FinishedStudy>();
+                    studies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed()).ToList();
+
+                entireProfileDTO.FinishedStudiesDetailed = _mapper.Map<List<FinishedStudy>, List<FinishedStudyDetailedDTO>>
+                    (studies.Where(x => x.ProfileId == user.ProfileId).ToList());
+
+                return Ok(entireProfileDTO);
             }
             catch (Exception ex)
             {
@@ -53,11 +80,11 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPut("UpdateProfilePictureByUserId")]
-        public async Task<IActionResult> UpdateProfilePictureByUserId(string profilePicture, string userId)
+        public async Task<IActionResult> UpdateProfilePictureByUserId(string profilePicture)
         {
             try
             {
-               
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
                 profileToUpdate.ProfilePicture = profilePicture;
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
@@ -71,11 +98,11 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPut("UpdateProfileDescriptionByUserId")]
-        public async Task<IActionResult> UpdateProfileDescriptionByUserId(string profileDescription, string userId)
+        public async Task<IActionResult> UpdateProfileDescriptionByUserId(string profileDescription)
         {
             try
             {
-
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
                 profileToUpdate.Description = profileDescription;
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
