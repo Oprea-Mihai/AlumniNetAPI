@@ -28,7 +28,6 @@ public partial class AlumniNetAppContext : DbContext
         catch (Exception e) { throw new Exception(e.Message); }
     }
 
-
     public virtual DbSet<Experience> Experiences { get; set; }
 
     public virtual DbSet<Faculty> Faculties { get; set; }
@@ -47,6 +46,7 @@ public partial class AlumniNetAppContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Experience>(entity =>
@@ -112,6 +112,9 @@ public partial class AlumniNetAppContext : DbContext
         {
             entity.ToTable("Post");
 
+            entity.Property(e => e.PostingDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);

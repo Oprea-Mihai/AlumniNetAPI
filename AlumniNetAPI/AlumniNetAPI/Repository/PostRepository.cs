@@ -1,5 +1,6 @@
 ﻿using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlumniNetAPI.Repository
 {
@@ -7,6 +8,13 @@ namespace AlumniNetAPI.Repository
     {
         public PostRepository(AlumniNetAppContext context) : base(context)
         {
+        }
+
+        public async Task<List<Post>> GetAllDetailedAsync()
+        {
+            List<Post> posts = await _dbSet
+                .Include(p => p.User).ThenInclude(u => u.Profile).ToListAsync();
+            return posts;
         }
     }
 }
