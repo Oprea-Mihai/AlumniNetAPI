@@ -71,11 +71,16 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                if(userId!=null) { 
                 User user = _mapper.Map<UserDTO, User>(newUser);
                 user.Profile = new Models.Profile();
+                user.UserId = userId;
                 await _unitOfWork.UserRepository.AddAsync(user);
                 await _unitOfWork.CompleteAsync();
                 return Ok(user);
+                }
+                return BadRequest("User not recognized by authentication provider");
             }
             catch (Exception ex)
             {
