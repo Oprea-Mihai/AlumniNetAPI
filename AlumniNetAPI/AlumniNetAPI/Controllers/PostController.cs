@@ -2,6 +2,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,11 +57,13 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("AddNewPostForUser")]
-        public async Task<IActionResult> AddNewPostForUser(PostDTO post, string userId)
+        public async Task<IActionResult> AddNewPostForUser(PostDTO post)
         {
             try
             {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 Post postMapping = _mapper.Map<PostDTO, Post>(post);
                 postMapping.UserId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).UserId;
                 await _unitOfWork.PostRepository.AddAsync(postMapping);
