@@ -93,15 +93,21 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                FinishedStudy updated = _mapper.Map<FinishedStudyDTO, FinishedStudy>(finishedStudy);
-                await _unitOfWork.FinishedStudyRepository.UpdateAsync(updated);
+                FinishedStudy toUpdate = await _unitOfWork.FinishedStudyRepository
+                    .GetFinishedStudyByIdAsync(finishedStudy.FinishedStudyId);
+
+                toUpdate.SpecializationId=finishedStudy.SpecializationId;
+                toUpdate.StudyProgramId=finishedStudy.StudyProgramId;
+                toUpdate.LearningScheduleId=finishedStudy.LearningScheduleId;
+                toUpdate.Year=finishedStudy.Year;
+
+                await _unitOfWork.FinishedStudyRepository.UpdateAsync(toUpdate);
                 await _unitOfWork.CompleteAsync();
-                return Ok(updated);
+                return Ok(true);
             }
             catch (Exception)
             {
-
-                throw;
+                return BadRequest();
             }
 
         }
