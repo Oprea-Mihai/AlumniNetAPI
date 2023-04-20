@@ -2,6 +2,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
@@ -34,6 +35,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("GetSpecializationsByFacultyId")]
         public async Task<IActionResult> GetSpecializationsByFacultyId(int facultyId)
         {
@@ -41,6 +43,25 @@ namespace AlumniNetAPI.Controllers
             {
                 List<SpecializationDTO>specializations= _mapper.Map<List<Specialization>, List<SpecializationDTO>>
                     (await _unitOfWork.SpecializationRepository.GetSpecializationsByFacultyIdAsync(facultyId));
+                return Ok(specializations);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+
+            }
+        }
+
+        [Authorize]
+        [HttpGet("GetSpecializationsByFacultyAndSearchString")]
+        public async Task<IActionResult> GetSpecializationsByFacultyAndSearchString(int facultyId,string searchedString)
+        {
+            try
+            {
+                List<SpecializationDTO> specializations = _mapper.Map<List<Specialization>, List<SpecializationDTO>>
+                    (await _unitOfWork.SpecializationRepository.GetSpecializationsByFacultyIdAsync(facultyId))
+                    .Where(x => x.SpecializationName.ToLower().Contains(searchedString.ToLower()))
+                    .ToList(); 
                 return Ok(specializations);
             }
             catch (Exception ex)

@@ -2,6 +2,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
@@ -19,8 +20,9 @@ namespace AlumniNetAPI.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("GetAllLearningSchedule")]
-        public async Task<IActionResult> GetAllLearningSchedule()
+        [Authorize]
+        [HttpGet("GetAllLearningSchedules")]
+        public async Task<IActionResult> GetAllLearningSchedules()
         {
             try
             {

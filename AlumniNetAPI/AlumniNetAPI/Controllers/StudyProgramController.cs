@@ -2,6 +2,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
@@ -17,8 +18,9 @@ namespace AlumniNetAPI.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("GetAllStudyProgram")]
-        public async Task<IActionResult> GetAllStudyProgram()
+        [Authorize]
+        [HttpGet("GetAllStudyPrograms")]
+        public async Task<IActionResult> GetAllStudyPrograms()
         {
             try
             {

@@ -70,7 +70,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
-        [HttpPut("UpdateFinishedStudy")]
+        [HttpPut("UpdateFinishedStudySpecialization")]
         public async Task<IActionResult>UpdateFinishedStudySpecialization(FinishedStudyDTO finishedStudy)
         {
             try
@@ -86,6 +86,24 @@ namespace AlumniNetAPI.Controllers
                 throw;
             }
             
+        }
+        [Authorize]
+        [HttpPut("UpdateFinishedStudy")]
+        public async Task<IActionResult> UpdateFinishedStudy([FromBody]FinishedStudyDTO finishedStudy)
+        {
+            try
+            {
+                FinishedStudy updated = _mapper.Map<FinishedStudyDTO, FinishedStudy>(finishedStudy);
+                await _unitOfWork.FinishedStudyRepository.UpdateAsync(updated);
+                await _unitOfWork.CompleteAsync();
+                return Ok(updated);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
     }
 }

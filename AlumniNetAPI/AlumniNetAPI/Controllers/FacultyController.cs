@@ -2,6 +2,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
@@ -35,6 +36,26 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("GetFacultiesSearchSuggestions")]
+        public async Task<IActionResult> GetFacultiesSearchSuggestions(string searchedString)
+        {
+            try
+            {
+                List<FacultyDTO>faculties =_mapper.Map<List<Faculty>,List<FacultyDTO>>
+                    ((await _unitOfWork.FacultyRepository.GetAllAsync())
+                    .Where(x => x.FacultyName.ToLower().Contains(searchedString.ToLower()))
+                    .ToList());
+                   
+                return Ok(faculties);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+
+            }
+        }
+
         [HttpGet("GetFacultyById")]
         public async Task<IActionResult> GetFacultyById(int id)
         {
@@ -49,7 +70,7 @@ namespace AlumniNetAPI.Controllers
                 return BadRequest(ex.Message);
 
             }
-        }
+        }     
 
     }
 }
