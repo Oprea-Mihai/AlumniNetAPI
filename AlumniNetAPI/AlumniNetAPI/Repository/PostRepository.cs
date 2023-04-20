@@ -16,5 +16,12 @@ namespace AlumniNetAPI.Repository
                 .Include(p => p.User).ThenInclude(u => u.Profile).ToListAsync();
             return posts;
         }
+
+        public async Task<Post> GetPostByIdAsync(int id)
+        {
+            Post post = await _dbSet.SingleAsync(p => p.PostId == id);
+            return post;
+        }
+
     }
 }
