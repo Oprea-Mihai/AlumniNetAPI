@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AlumniNetAPI.Controllers
 {
     [Route("api/[controller]")]
-    public class FacultyController : ControllerBase    
+    public class FacultyController : ControllerBase
 
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -25,7 +25,7 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                var faculties =_mapper.Map<IEnumerable<Faculty>,IEnumerable<FacultyDTO>>
+                var faculties = _mapper.Map<IEnumerable<Faculty>, IEnumerable<FacultyDTO>>
                     (await _unitOfWork.FacultyRepository.GetAllAsync());
                 return Ok(faculties);
             }
@@ -42,11 +42,15 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                List<FacultyDTO>faculties =_mapper.Map<List<Faculty>,List<FacultyDTO>>
+                List<FacultyDTO> faculties = new List<FacultyDTO>();
+                if (searchedString == null)
+                    return Ok(faculties);
+
+                faculties = _mapper.Map<List<Faculty>, List<FacultyDTO>>
                     ((await _unitOfWork.FacultyRepository.GetAllAsync())
                     .Where(x => x.FacultyName.ToLower().Contains(searchedString.ToLower()))
                     .ToList());
-                   
+
                 return Ok(faculties);
             }
             catch (Exception ex)
@@ -70,7 +74,7 @@ namespace AlumniNetAPI.Controllers
                 return BadRequest(ex.Message);
 
             }
-        }     
+        }
 
     }
 }

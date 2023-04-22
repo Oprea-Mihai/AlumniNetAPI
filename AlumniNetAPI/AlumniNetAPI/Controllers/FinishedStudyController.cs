@@ -25,7 +25,7 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                FinishedStudyDetailedDTO study =_mapper.Map<FinishedStudy,FinishedStudyDetailedDTO> 
+                FinishedStudyDetailedDTO study = _mapper.Map<FinishedStudy, FinishedStudyDetailedDTO>
                     (await _unitOfWork.FinishedStudyRepository.GetFinishedStudyByIdAsync(id));
                 return Ok(study);
             }
@@ -44,8 +44,8 @@ namespace AlumniNetAPI.Controllers
                 //string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
 
-                List<FinishedStudy> studies=(await _unitOfWork.FinishedStudyRepository.GetAllDetailed())
-                    .Where(x=>x.ProfileId==profileId).ToList();
+                List<FinishedStudy> studies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed())
+                    .Where(x => x.ProfileId == profileId).ToList();
 
                 List<FinishedStudyDetailedDTO> studiesDTO = _mapper.Map<List<FinishedStudy>, List<FinishedStudyDetailedDTO>>(studies);
                 return Ok(studiesDTO);
@@ -71,7 +71,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPut("UpdateFinishedStudySpecialization")]
-        public async Task<IActionResult>UpdateFinishedStudySpecialization(FinishedStudyDTO finishedStudy)
+        public async Task<IActionResult> UpdateFinishedStudySpecialization(FinishedStudyDTO finishedStudy)
         {
             try
             {
@@ -85,21 +85,21 @@ namespace AlumniNetAPI.Controllers
 
                 throw;
             }
-            
+
         }
         [Authorize]
         [HttpPut("UpdateFinishedStudy")]
-        public async Task<IActionResult> UpdateFinishedStudy([FromBody]FinishedStudyDTO finishedStudy)
+        public async Task<IActionResult> UpdateFinishedStudy([FromBody] FinishedStudyDTO finishedStudy)
         {
             try
             {
                 FinishedStudy toUpdate = await _unitOfWork.FinishedStudyRepository
                     .GetFinishedStudyByIdAsync(finishedStudy.FinishedStudyId);
 
-                toUpdate.SpecializationId=finishedStudy.SpecializationId;
-                toUpdate.StudyProgramId=finishedStudy.StudyProgramId;
-                toUpdate.LearningScheduleId=finishedStudy.LearningScheduleId;
-                toUpdate.Year=finishedStudy.Year;
+                toUpdate.SpecializationId = finishedStudy.SpecializationId;
+                toUpdate.StudyProgramId = finishedStudy.StudyProgramId;
+                toUpdate.LearningScheduleId = finishedStudy.LearningScheduleId;
+                toUpdate.Year = finishedStudy.Year;
 
                 await _unitOfWork.FinishedStudyRepository.UpdateAsync(toUpdate);
                 await _unitOfWork.CompleteAsync();
@@ -111,5 +111,50 @@ namespace AlumniNetAPI.Controllers
             }
 
         }
+
+        [Authorize]
+        [HttpPost("AddFinishedStudy")]
+        public async Task<IActionResult> AddFinishedStudy([FromBody] FinishedStudyDTO finishedStudy)
+        {
+            try
+            {
+                FinishedStudy toAdd = new FinishedStudy();
+
+                toAdd.SpecializationId = finishedStudy.SpecializationId;
+                toAdd.StudyProgramId = finishedStudy.StudyProgramId;
+                toAdd.LearningScheduleId = finishedStudy.LearningScheduleId;
+                toAdd.Year = finishedStudy.Year;
+                toAdd.ProfileId = (await _unitOfWork.UserRepository
+                    .GetUserByIdAsync(User.Claims.FirstOrDefault(c => c.Type == "id")?.Value)).ProfileId;
+
+                await _unitOfWork.FinishedStudyRepository.AddAsync(toAdd);
+                await _unitOfWork.CompleteAsync();
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteFinishedStudy")]
+        public async Task<IActionResult> DeleteFinishedStudy(int id)
+        {
+            try
+            {
+                FinishedStudy toDelete=await _unitOfWork.FinishedStudyRepository.GetFinishedStudyByIdAsync(id);
+                await _unitOfWork.FinishedStudyRepository.DeleteAsync(toDelete);
+                await _unitOfWork.CompleteAsync();
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+
     }
 }
