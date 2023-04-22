@@ -2,6 +2,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
@@ -33,12 +34,13 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
-
+        [Authorize]
         [HttpPost("AddNewExperienceForUser")]
-        public async Task<IActionResult> AddNewExperienceForUser(ExperienceDTO experience, string userId)
+        public async Task<IActionResult> AddNewExperienceForUser([FromBody]ExperienceDTO experience)
         {
             try
             {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 Experience expMapping = _mapper.Map<ExperienceDTO, Experience>(experience);
                 expMapping.ProfileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
                 await _unitOfWork.ExperienceRepository.AddAsync(expMapping);
@@ -51,6 +53,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("GetAllExperiencesForUser")]
         public async Task<IActionResult> GetAllExperiencesForUser(string userId)
         {
@@ -71,6 +74,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("UpdateExperience")]
         public async Task<IActionResult> UpdateExperience(ExperienceDTO experience)
         {
