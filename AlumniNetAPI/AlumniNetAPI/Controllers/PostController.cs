@@ -38,6 +38,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("GetBatchOfPostsSorted")]
         public async Task<IActionResult> GetBatchOfPostsSorted(int batchSize, int currentIndex)
         {
