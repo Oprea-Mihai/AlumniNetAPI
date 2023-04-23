@@ -41,11 +41,15 @@ namespace AlumniNetAPI.Controllers
             try
             {
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-                Experience expMapping = _mapper.Map<ExperienceDTO, Experience>(experience);
-                expMapping.ProfileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
-                await _unitOfWork.ExperienceRepository.AddAsync(expMapping);
+                Experience toAddexperience = new Experience() ;
+                toAddexperience.CompanyName = experience.CompanyName;
+                toAddexperience.JobTitle = experience.JobTitle;
+                toAddexperience.StartDate = experience.StartDate;
+                toAddexperience.EndDate = experience.EndDate;
+                toAddexperience.ProfileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
+                await _unitOfWork.ExperienceRepository.AddAsync(toAddexperience);
                 await _unitOfWork.CompleteAsync();
-                return Ok(expMapping);
+                return Ok(toAddexperience);
             }
             catch (Exception ex)
             {
@@ -55,10 +59,11 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpGet("GetAllExperiencesForUser")]
-        public async Task<IActionResult> GetAllExperiencesForUser(string userId)
+        public async Task<IActionResult> GetAllExperiencesForUser()
         {
             try
             {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 int profileId= (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
                 List<Experience> experiences = new List<Experience>();
                 experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
@@ -92,6 +97,99 @@ namespace AlumniNetAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut("UpdateExperienceCompanyName")]
+
+        public async Task<IActionResult> UpdateExperienceCompanyName(int experienceId, string companyName)
+        {
+            try
+            {
+                Experience toUpdate=await _unitOfWork.ExperienceRepository.GetExperienceByIdAsync(experienceId);
+                toUpdate.CompanyName=companyName;
+                await _unitOfWork.ExperienceRepository.UpdateAsync(toUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok(toUpdate);
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut("UpdateExperienceJobTitle")]
+
+        public async Task<IActionResult> UpdateExperienceJobTitle(int experienceId, string jobTitle)
+        {
+            try
+            {
+                Experience toUpdate = await _unitOfWork.ExperienceRepository.GetExperienceByIdAsync(experienceId);
+                toUpdate.JobTitle = jobTitle;
+                await _unitOfWork.ExperienceRepository.UpdateAsync(toUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok(toUpdate);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut("UpdateExperienceStartDate")]
+
+        public async Task<IActionResult> UpdateExperienceStartDate(int experienceId, int startDate)
+        {
+            try
+            {
+                Experience toUpdate = await _unitOfWork.ExperienceRepository.GetExperienceByIdAsync(experienceId);
+                toUpdate.StartDate = startDate;
+                await _unitOfWork.ExperienceRepository.UpdateAsync(toUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok(toUpdate);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut("UpdateExperienceEndDate")]
+
+        public async Task<IActionResult> UpdateExperienceEndDate(int experienceId, int endDate)
+        {
+            try
+            {
+                Experience toUpdate = await _unitOfWork.ExperienceRepository.GetExperienceByIdAsync(experienceId);
+                toUpdate.EndDate = endDate;
+                await _unitOfWork.ExperienceRepository.UpdateAsync(toUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok(toUpdate);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteExperience")]
+        public async Task<IActionResult> DeleteFinishedStudy(int experienceId)
+        {
+            try
+            {
+                Experience toDeleteExperience = await _unitOfWork.ExperienceRepository.GetExperienceByIdAsync(experienceId);
+                await _unitOfWork.ExperienceRepository.DeleteAsync(toDeleteExperience);
+                await _unitOfWork.CompleteAsync();
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
             }
         }
     }
