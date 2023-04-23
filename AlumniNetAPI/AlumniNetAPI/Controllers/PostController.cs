@@ -60,7 +60,7 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpPost("AddNewPostForUser")]
-        public async Task<IActionResult> AddNewPostForUser(PostDTO post)
+        public async Task<IActionResult> AddNewPostForUser([FromBody] PostDTO post)
         {
             try
             {
@@ -77,6 +77,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("UpdatePost")]
         public async Task<IActionResult> UpdatePost(PostDTO post)
         {
@@ -98,6 +99,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("UpdatePostImage")]
         public async Task<IActionResult> UpdatePostImage(int postId, string postImage)
         {
@@ -115,6 +117,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("UpdatePostText")]
         public async Task<IActionResult> UpdatePostText(int postId , string postText)
         {
@@ -132,6 +135,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("UpdatePostTitle")]
         public async Task<IActionResult> UpdatePostTitle(int postId, string postTitle)
         {
@@ -149,6 +153,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("DeletePost")]
 
         public async Task<IActionResult> DeletePost(int postId)
