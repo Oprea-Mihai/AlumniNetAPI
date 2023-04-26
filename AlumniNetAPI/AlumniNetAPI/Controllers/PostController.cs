@@ -59,6 +59,29 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
+        [HttpGet("GetPostsByUserId")]
+
+        public async Task<IActionResult> GetPostsByUserId()
+        {
+            try
+            {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                List<Post> posts = new List<Post>();
+                posts = (await _unitOfWork.PostRepository.GetAllAsync()).ToList();
+
+                List<PostDTO> userPosts = _mapper.Map<List<Post>, List<PostDTO>>
+                    (posts.Where(post => post.UserId == userId).OrderByDescending(post=> post.PostingDate).ToList());
+
+                return Ok(userPosts);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
+        }
+
+        [Authorize]
         [HttpPost("AddNewPostForUser")]
         public async Task<IActionResult> AddNewPostForUser([FromBody] PostDTO post)
         {

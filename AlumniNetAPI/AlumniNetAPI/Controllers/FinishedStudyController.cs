@@ -35,13 +35,13 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet("GetFinishedStudyByUserId")]
-        public async Task<IActionResult> GetFinishedStudyByUserId(string userId)
+        public async Task<IActionResult> GetFinishedStudyByUserId()
         {
             try
             {
-                //string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 int profileId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).ProfileId;
 
                 List<FinishedStudy> studies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed())
