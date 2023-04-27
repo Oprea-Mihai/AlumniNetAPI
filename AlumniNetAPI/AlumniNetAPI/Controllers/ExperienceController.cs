@@ -80,8 +80,8 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
-        [HttpPost("UpdateExperience")]
-        public async Task<IActionResult> UpdateExperience(ExperienceDTO experience)
+        [HttpPut("UpdateExperience")]
+        public async Task<IActionResult> UpdateExperience([FromBody]ExperienceDTO experience)
         {
             try
             {
