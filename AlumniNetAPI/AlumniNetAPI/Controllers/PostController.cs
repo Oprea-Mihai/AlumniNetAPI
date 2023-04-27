@@ -192,7 +192,7 @@ namespace AlumniNetAPI.Controllers
 
                 await _unitOfWork.PostRepository.DeleteAsync(postToDelete);
                 await _unitOfWork.CompleteAsync();
-                return NoContent();
+                return Ok(true);
             }
             catch(Exception ex)
             {
