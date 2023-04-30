@@ -82,6 +82,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("UpdateProfilePictureByUserId")]
         public async Task<IActionResult> UpdateProfilePictureByUserId(IFormFile file)
         {
@@ -91,15 +92,38 @@ namespace AlumniNetAPI.Controllers
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
 
-                if (profileToUpdate.ProfilePicture != null)
-                    await _fileStorageService.DeleteFileByKeyAsync("alumni-app-bucket", profileToUpdate.ProfilePicture);
+                if (profileToUpdate.ProfilePicture != null||profileToUpdate.ProfilePicture=="")
+                    await _fileStorageService.DeleteFileByKeyAsync(profileToUpdate.ProfilePicture);
 
                 string key = await _fileStorageService.UploadFileAsync(file);
                 profileToUpdate.ProfilePicture = key;
 
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
                 await _unitOfWork.CompleteAsync();
-                return Ok(profileToUpdate);
+                return Ok(profileToUpdate.ProfilePicture);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("DeleteProfilePictureByUserId")]
+        public async Task<IActionResult> DeleteProfilePictureByUserId()
+        {
+            try
+            {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+               Profile profile=(await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
+                if(profile.ProfilePicture != null) 
+                await _fileStorageService.DeleteFileByKeyAsync(profile.ProfilePicture);
+
+                profile.ProfilePicture = null;
+
+                await _unitOfWork.ProfileRepository.UpdateAsync(profile);
+                await _unitOfWork.CompleteAsync();
+                return Ok("Successfully deleted!");
             }
             catch (Exception ex)
             {

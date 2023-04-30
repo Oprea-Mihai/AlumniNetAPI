@@ -1,6 +1,7 @@
 ﻿using AlumniNetAPI.DTOs;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
@@ -15,7 +16,7 @@ namespace AlumniNetAPI.Controllers
             _s3Client = s3Client;
         }
 
-
+        [Authorize]
         [HttpPost("UploadFile")]
         public async Task<IActionResult> UploadFileAsync(IFormFile file, string bucketName="alumni-app-bucket", string prefix="")
         {
@@ -33,6 +34,7 @@ namespace AlumniNetAPI.Controllers
             return Ok(key);
         }
 
+        [Authorize]
         [HttpGet("GetAllFiles")]
         public async Task<IActionResult> GetAllFilesAsync(string bucketName = "alumni-app-bucket", string prefix = "")
         {
@@ -61,6 +63,7 @@ namespace AlumniNetAPI.Controllers
             return Ok(s3Objects);
         }
 
+        [Authorize]
         [HttpGet("GetFileByKey")]
         public async Task<IActionResult> GetFileByKeyAsync(string key, string bucketName= "alumni-app-bucket")
         {
@@ -70,13 +73,14 @@ namespace AlumniNetAPI.Controllers
             return File(s3Object.ResponseStream, s3Object.Headers.ContentType);
         }
 
+        [Authorize]
         [HttpDelete("DeleteFileByKey")]
         public async Task<IActionResult> DeleteFileByKeyAsync(string key,string bucketName= "alumni-app-bucket")
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist");
             await _s3Client.DeleteObjectAsync(bucketName, key);
-            return NoContent();
+            return Ok("Successfully deleted!");
         }
     }
 }
