@@ -1,6 +1,7 @@
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository;
 using AlumniNetAPI.Repository.Interfaces;
+using AlumniNetAPI.Services;
 using Amazon.S3;
 using FirebaseAdmin;
 using FirebaseAdminAuthentication.DependencyInjection.Extensions;
@@ -37,6 +38,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AlumniNetAppContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MyContext")));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
 
 var app = builder.Build();
 

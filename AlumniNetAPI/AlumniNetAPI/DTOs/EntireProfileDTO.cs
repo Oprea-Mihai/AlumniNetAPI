@@ -3,7 +3,7 @@
     public class EntireProfileDTO
     {
         //profile
-        public Stream? ProfilePicture { get; set; }
+        public string? ProfilePicture { get; set; }
 
         public string? Description { get; set; }
 

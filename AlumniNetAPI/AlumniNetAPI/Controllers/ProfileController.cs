@@ -37,12 +37,12 @@ namespace AlumniNetAPI.Controllers
                 EntireProfileDTO entireProfileDTO = new EntireProfileDTO();
 
                 entireProfileDTO.Description = profileMapping.Description;
-                //entireProfileDTO.ProfilePicture = profileMapping.ProfilePicture;
+                entireProfileDTO.ProfilePicture = profileMapping.ProfilePicture;
                 entireProfileDTO.FirstName = user.FirstName;
                 entireProfileDTO.LastName = user.LastName;
                 entireProfileDTO.Email = user.Email;
                 entireProfileDTO.IsValid = user.IsValid;
-
+               
                 List<Experience> experiences = new List<Experience>();
                 experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
 
