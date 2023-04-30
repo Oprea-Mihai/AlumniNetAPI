@@ -1,6 +1,7 @@
 ﻿using AlumniNetAPI.DTOs;
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
+using AlumniNetAPI.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,13 @@ namespace AlumniNetAPI.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IFileStorageService _fileStorageService;
 
-        public ProfileController(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProfileController(IUnitOfWork unitOfWork, IMapper mapper, IFileStorageService fileStorageService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _fileStorageService = fileStorageService;
         }
 
         [Authorize]
@@ -29,12 +32,12 @@ namespace AlumniNetAPI.Controllers
             {
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
-                UserDTO user = _mapper.Map<User,UserDTO>(await _unitOfWork.UserRepository.GetUserByIdAsync(userId));
+                UserDTO user = _mapper.Map<User, UserDTO>(await _unitOfWork.UserRepository.GetUserByIdAsync(userId));
                 ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByIdAsync(user.ProfileId));
                 EntireProfileDTO entireProfileDTO = new EntireProfileDTO();
 
                 entireProfileDTO.Description = profileMapping.Description;
-                entireProfileDTO.ProfilePicture= profileMapping.ProfilePicture;
+                //entireProfileDTO.ProfilePicture = profileMapping.ProfilePicture;
                 entireProfileDTO.FirstName = user.FirstName;
                 entireProfileDTO.LastName = user.LastName;
                 entireProfileDTO.Email = user.Email;
@@ -43,12 +46,12 @@ namespace AlumniNetAPI.Controllers
                 List<Experience> experiences = new List<Experience>();
                 experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
 
-                entireProfileDTO.Experiences=_mapper.Map<List<Experience>, List<ExperienceDTO>>
+                entireProfileDTO.Experiences = _mapper.Map<List<Experience>, List<ExperienceDTO>>
                     (experiences.Where(exp => exp.ProfileId == user.ProfileId).ToList());
 
 
                 List<FinishedStudy> studies = new List<FinishedStudy>();
-                    studies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed()).ToList();
+                studies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed()).ToList();
 
                 entireProfileDTO.FinishedStudiesDetailed = _mapper.Map<List<FinishedStudy>, List<FinishedStudyDetailedDTO>>
                     (studies.Where(x => x.ProfileId == user.ProfileId).ToList());
@@ -67,7 +70,7 @@ namespace AlumniNetAPI.Controllers
             try
             {
                 Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).Profile;
-                profileToUpdate.Description=profile.Description;
+                profileToUpdate.Description = profile.Description;
                 profileToUpdate.ProfilePicture = profile.ProfilePicture;
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
                 await _unitOfWork.CompleteAsync();
@@ -80,13 +83,20 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpPut("UpdateProfilePictureByUserId")]
-        public async Task<IActionResult> UpdateProfilePictureByUserId(string profilePicture)
+        public async Task<IActionResult> UpdateProfilePictureByUserId(IFormFile file)
         {
             try
             {
+
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
-                profileToUpdate.ProfilePicture = profilePicture;
+
+                if (profileToUpdate.ProfilePicture != null)
+                    await _fileStorageService.DeleteFileByKeyAsync("alumni-app-bucket", profileToUpdate.ProfilePicture);
+
+                string key = await _fileStorageService.UploadFileAsync(file);
+                profileToUpdate.ProfilePicture = key;
+
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
                 await _unitOfWork.CompleteAsync();
                 return Ok(profileToUpdate);

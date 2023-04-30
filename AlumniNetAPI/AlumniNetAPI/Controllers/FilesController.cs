@@ -2,6 +2,7 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace AlumniNetAPI.Controllers
 {   
@@ -16,23 +17,24 @@ namespace AlumniNetAPI.Controllers
 
 
         [HttpPost("UploadFile")]
-        public async Task<IActionResult> UploadFileAsync(IFormFile file, string bucketName, string? prefix)
+        public async Task<IActionResult> UploadFileAsync(IFormFile file, string bucketName="alumni-app-bucket", string prefix="")
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
+            string key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{prefix?.TrimEnd('/')}/{file.FileName}";
             var request = new PutObjectRequest()
             {
                 BucketName = bucketName,
-                Key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{prefix?.TrimEnd('/')}/{file.FileName}",
+                Key = key,
                 InputStream = file.OpenReadStream()
             };
             request.Metadata.Add("Content-Type", file.ContentType);
             await _s3Client.PutObjectAsync(request);
-            return Ok($"File {prefix}/{file.FileName} uploaded to S3 successfully!");
+            return Ok(key);
         }
 
         [HttpGet("GetAllFiles")]
-        public async Task<IActionResult> GetAllFilesAsync(string bucketName, string? prefix)
+        public async Task<IActionResult> GetAllFilesAsync(string bucketName = "alumni-app-bucket", string prefix = "")
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
@@ -60,7 +62,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpGet("GetFileByKey")]
-        public async Task<IActionResult> GetFileByKeyAsync(string bucketName, string key)
+        public async Task<IActionResult> GetFileByKeyAsync(string key, string bucketName= "alumni-app-bucket")
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");
@@ -69,7 +71,7 @@ namespace AlumniNetAPI.Controllers
         }
 
         [HttpDelete("DeleteFileByKey")]
-        public async Task<IActionResult> DeleteFileByKeyAsync(string bucketName, string key)
+        public async Task<IActionResult> DeleteFileByKeyAsync(string key,string bucketName= "alumni-app-bucket")
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist");
