@@ -14,11 +14,11 @@ namespace AlumniNetAPI.Services
             _s3Client = s3Client;
         }
 
-        public async Task<string> UploadFileAsync(IFormFile file, string bucketName = "alumni-app-bucket",  string prefix = "" )
+        public async Task<string> UploadFileAsync(IFormFile file, string prefix = "", string bucketName = "alumni-app-bucket")
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) throw new Exception($"Bucket {bucketName} does not exist.");
-            string key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{prefix?.TrimEnd('/')}/{file.FileName}";
+            string key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{file.FileName}-{prefix?.TrimEnd('/')}";
             var request = new PutObjectRequest()
             {
                 BucketName = bucketName,

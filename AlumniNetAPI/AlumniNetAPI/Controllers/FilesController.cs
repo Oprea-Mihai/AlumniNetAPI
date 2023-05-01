@@ -18,7 +18,7 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpPost("UploadFile")]
-        public async Task<IActionResult> UploadFileAsync(IFormFile file, string bucketName="alumni-app-bucket", string prefix="")
+        public async Task<IActionResult> UploadFileAsync(IFormFile file,string prefix = "" ,string bucketName="alumni-app-bucket")
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
             if (!bucketExists) return NotFound($"Bucket {bucketName} does not exist.");

@@ -60,6 +60,7 @@ namespace AlumniNetAPI.Controllers
             }
             catch (Exception ex)
             {
+                
                 return BadRequest(ex.Message);
             }
         }
@@ -90,12 +91,14 @@ namespace AlumniNetAPI.Controllers
             {
 
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
                 Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
 
                 if (profileToUpdate.ProfilePicture != null||profileToUpdate.ProfilePicture=="")
                     await _fileStorageService.DeleteFileByKeyAsync(profileToUpdate.ProfilePicture);
 
-                string key = await _fileStorageService.UploadFileAsync(file);
+                string prefix = $"{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8)}";
+                string key = await _fileStorageService.UploadFileAsync(file,prefix);
                 profileToUpdate.ProfilePicture = key;
 
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
