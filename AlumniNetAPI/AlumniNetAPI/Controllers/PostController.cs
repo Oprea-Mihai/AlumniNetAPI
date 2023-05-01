@@ -92,7 +92,7 @@ namespace AlumniNetAPI.Controllers
                 postMapping.UserId = (await _unitOfWork.UserRepository.GetUserByIdAsync(userId)).UserId;
                 await _unitOfWork.PostRepository.AddAsync(postMapping);
                 await _unitOfWork.CompleteAsync();
-                return Ok(postMapping);
+                return Ok("Post created successfully");
             }
             catch (Exception ex)
             {
