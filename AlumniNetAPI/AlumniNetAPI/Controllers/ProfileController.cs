@@ -134,6 +134,7 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("UpdateProfileDescriptionByUserId")]
         public async Task<IActionResult> UpdateProfileDescriptionByUserId(string profileDescription)
         {
