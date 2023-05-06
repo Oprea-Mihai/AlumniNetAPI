@@ -1,9 +1,11 @@
 ﻿using AlumniNetAPI.DTOs;
 using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
+using AlumniNetAPI.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,11 +14,12 @@ namespace AlumniNetAPI.Controllers
     [Route("api/[controller]")]
     public class PostController : Controller
     {
+        private IFileStorageService _fileStorageService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public PostController(IUnitOfWork unitOfWork, IMapper mapper)
+        public PostController(IUnitOfWork unitOfWork, IMapper mapper, IFileStorageService fileStorageService)
         {
+            _fileStorageService = fileStorageService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
@@ -48,7 +51,7 @@ namespace AlumniNetAPI.Controllers
                 List<PostWithUserDataDTO> descendingOrderedPosts = _mapper.Map<List<Post>, List<PostWithUserDataDTO>>
                     (posts.OrderByDescending(p => p.PostingDate).ToList());
 
-                List <PostWithUserDataDTO> batchToDeliver=descendingOrderedPosts.Skip(batchSize * currentIndex).Take(batchSize).ToList();
+                List<PostWithUserDataDTO> batchToDeliver = descendingOrderedPosts.Skip(batchSize * currentIndex).Take(batchSize).ToList();
 
                 return Ok(batchToDeliver);
             }
@@ -70,15 +73,16 @@ namespace AlumniNetAPI.Controllers
                 posts = (await _unitOfWork.PostRepository.GetAllAsync()).ToList();
 
                 List<PostDTO> userPosts = _mapper.Map<List<Post>, List<PostDTO>>
-                    (posts.Where(post => post.UserId == userId).OrderByDescending(post=> post.PostingDate).ToList());
+                    (posts.Where(post => post.UserId == userId).OrderByDescending(post => post.PostingDate).ToList());
 
                 return Ok(userPosts);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            
+
         }
 
         [Authorize]
@@ -101,6 +105,25 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
+        [HttpPut("UploadPostImage")]
+        public async Task<IActionResult> UploadPostImage(IFormFile file)
+        {
+            try
+            {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+                string prefix = $"{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8)}";
+                string key = await _fileStorageService.UploadFileAsync(file, prefix);
+
+                return Ok(key);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
         [HttpPost("UpdatePost")]
         public async Task<IActionResult> UpdatePost(PostDTO post)
         {
@@ -111,7 +134,7 @@ namespace AlumniNetAPI.Controllers
                 postToUpdate.Text = post.Text;
                 postToUpdate.Title = post.Title;
                 postToUpdate.Image = post.Image;
-                
+
                 await _unitOfWork.PostRepository.UpdateAsync(postToUpdate);
                 await _unitOfWork.CompleteAsync();
                 return Ok(postToUpdate);
@@ -142,7 +165,7 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpPut("UpdatePostText")]
-        public async Task<IActionResult> UpdatePostText(int postId , string postText)
+        public async Task<IActionResult> UpdatePostText(int postId, string postText)
         {
             try
             {
@@ -185,7 +208,7 @@ namespace AlumniNetAPI.Controllers
             {
                 Post postToDelete = (await _unitOfWork.PostRepository.GetPostByIdAsync(postId));
 
-                if(postToDelete == null)
+                if (postToDelete == null)
                 {
                     return NotFound();
                 }
@@ -194,7 +217,7 @@ namespace AlumniNetAPI.Controllers
                 await _unitOfWork.CompleteAsync();
                 return Ok(true);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
