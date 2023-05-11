@@ -110,6 +110,8 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
+                if (file.Length == 0)
+                    return BadRequest("Empty file!");
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
                 string prefix = $"{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8)}";
