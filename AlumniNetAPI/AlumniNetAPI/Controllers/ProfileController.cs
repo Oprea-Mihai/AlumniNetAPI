@@ -65,6 +65,47 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("GetProfileById")]
+        public async Task<IActionResult> GetProfileById(int profileId)
+        {
+            try
+            {
+                
+
+                UserDTO user = _mapper.Map<User, UserDTO>(await _unitOfWork.UserRepository.GetUserByProfileIdAsync(profileId));
+                ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByIdAsync(profileId));
+                EntireProfileDTO entireProfileDTO = new EntireProfileDTO();
+
+                entireProfileDTO.Description = profileMapping.Description;
+                entireProfileDTO.ProfilePicture = profileMapping.ProfilePicture;
+                entireProfileDTO.FirstName = user.FirstName;
+                entireProfileDTO.LastName = user.LastName;
+                entireProfileDTO.Email = user.Email;
+                entireProfileDTO.IsValid = user.IsValid;
+
+                List<Experience> experiences = new List<Experience>();
+                experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
+
+                entireProfileDTO.Experiences = _mapper.Map<List<Experience>, List<ExperienceDTO>>
+                    (experiences.Where(exp => exp.ProfileId == user.ProfileId).ToList());
+
+
+                List<FinishedStudy> studies = new List<FinishedStudy>();
+                studies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed()).ToList();
+
+                entireProfileDTO.FinishedStudiesDetailed = _mapper.Map<List<FinishedStudy>, List<FinishedStudyDetailedDTO>>
+                    (studies.Where(x => x.ProfileId == user.ProfileId).ToList());
+
+                return Ok(entireProfileDTO);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPut("UpdateProfileByUserId")]
         public async Task<IActionResult> UpdateProfileByUserId(ProfileDTO profile, string userId)
         {

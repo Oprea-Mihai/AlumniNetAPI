@@ -15,6 +15,14 @@ namespace AlumniNetAPI.Repository
             return profile;
         }
 
-        
+        public async Task<Profile> GetProfileWithStudiesByIdAsync(int id)
+        {
+            Profile profile = await _dbSet.Include(fs=>fs.FinishedStudies)
+                .ThenInclude(s => s.Specialization).ThenInclude(f => f.Faculty)
+                .SingleAsync(p => p.ProfileId == id);
+            return profile;
+        }
+
+
     }
 }

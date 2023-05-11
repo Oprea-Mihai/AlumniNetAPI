@@ -6,5 +6,6 @@ namespace AlumniNetAPI.Repository.Interfaces
     {
         Task<User> GetUserByIdAsync(string id);
         Task<User> GetUserWithProfileByIdAsync(string id);
+        Task<User> GetUserByProfileIdAsync(int id);
     }
 }

@@ -26,7 +26,7 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                var users= (await _unitOfWork.UserRepository.GetAllAsync()).ToList();
+                var users = (await _unitOfWork.UserRepository.GetAllAsync()).ToList();
                 List<UserDTO> mappedUsers = _mapper.Map<List<User>, List<UserDTO>>(users.ToList());
 
                 return Ok(users);
@@ -53,7 +53,40 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
-        
+        [Authorize]
+        [HttpGet("GetUserSearchResults")]
+        public async Task<IActionResult> GetUserSearchResults(string searchedString)
+        {
+            try
+            {
+                List<UserSearchResultDTO> users =
+                    (await _unitOfWork.UserRepository.GetAllAsync())
+                    .Where(x => x.FirstName.ToLower().Contains(searchedString.ToLower())
+                    || x.LastName.ToLower().Contains(searchedString.ToLower())
+                    && x.IsValid == true)
+                     .Select(x => new UserSearchResultDTO
+                     {
+                         ProfileId = x.ProfileId,
+                         FirstName = x.FirstName,
+                         LastName = x.LastName
+                     })
+                     .ToList();
+
+                foreach (var user in users)
+                {
+                    Models.Profile profile = await _unitOfWork.ProfileRepository.GetProfileWithStudiesByIdAsync(user.ProfileId);
+                    user.ProfilePicture = profile.ProfilePicture;
+                    user.FacultyName = profile.FinishedStudies.First().Specialization.Faculty.FacultyName;
+                    user.GraduationYear = profile.FinishedStudies.First().Year;
+                }
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [Authorize]
         [HttpPost("AddUser")]
@@ -62,13 +95,14 @@ namespace AlumniNetAPI.Controllers
             try
             {
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-                if(userId!=null) { 
-                User user = _mapper.Map<UserDTO, User>(newUser);
-                user.Profile = new Models.Profile();
-                user.UserId = userId;
-                await _unitOfWork.UserRepository.AddAsync(user);
-                await _unitOfWork.CompleteAsync();
-                return Ok(user);
+                if (userId != null)
+                {
+                    User user = _mapper.Map<UserDTO, User>(newUser);
+                    user.Profile = new Models.Profile();
+                    user.UserId = userId;
+                    await _unitOfWork.UserRepository.AddAsync(user);
+                    await _unitOfWork.CompleteAsync();
+                    return Ok(user);
                 }
                 return BadRequest("User not recognized by authentication provider");
             }
