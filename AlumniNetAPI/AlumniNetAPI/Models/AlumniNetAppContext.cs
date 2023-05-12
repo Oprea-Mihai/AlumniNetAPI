@@ -27,12 +27,15 @@ public partial class AlumniNetAppContext : DbContext
         { optionsBuilder.UseSqlServer(DbConnection.ConnectionString); }
         catch (Exception e) { throw new Exception(e.Message); }
     }
+    public virtual DbSet<Event> Events { get; set; }
 
     public virtual DbSet<Experience> Experiences { get; set; }
 
     public virtual DbSet<Faculty> Faculties { get; set; }
 
     public virtual DbSet<FinishedStudy> FinishedStudies { get; set; }
+
+    public virtual DbSet<InvitedUser> InvitedUsers { get; set; }
 
     public virtual DbSet<LearningSchedule> LearningSchedules { get; set; }
 
@@ -42,13 +45,30 @@ public partial class AlumniNetAppContext : DbContext
 
     public virtual DbSet<Specialization> Specializations { get; set; }
 
+    public virtual DbSet<Status> Statuses { get; set; }
+
     public virtual DbSet<StudyProgram> StudyPrograms { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
-
    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Event>(entity =>
+        {
+            entity.ToTable("Event");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.Image)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Initiator)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+        });
+
         modelBuilder.Entity<Experience>(entity =>
         {
             entity.ToTable("Experience");
@@ -97,6 +117,31 @@ public partial class AlumniNetAppContext : DbContext
                 .HasForeignKey(d => d.StudyProgramId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FinishedStudy_StudyProgram");
+        });
+
+        modelBuilder.Entity<InvitedUser>(entity =>
+        {
+            entity.ToTable("InvitedUser");
+
+            entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+            entity.Property(e => e.UserId)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Event).WithMany(p => p.InvitedUsers)
+                .HasForeignKey(d => d.EventId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_InvitedUser_Event");
+
+            entity.HasOne(d => d.StatusNavigation).WithMany(p => p.InvitedUsers)
+                .HasForeignKey(d => d.Status)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_InvitedUser_Status");
+
+            entity.HasOne(d => d.User).WithMany(p => p.InvitedUsers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_InvitedUser_User");
         });
 
         modelBuilder.Entity<LearningSchedule>(entity =>
@@ -151,6 +196,15 @@ public partial class AlumniNetAppContext : DbContext
                 .HasConstraintName("FK_Specialization_Faculty");
         });
 
+        modelBuilder.Entity<Status>(entity =>
+        {
+            entity.ToTable("Status");
+
+            entity.Property(e => e.StatusName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<StudyProgram>(entity =>
         {
             entity.ToTable("StudyProgram");
@@ -174,9 +228,6 @@ public partial class AlumniNetAppContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.LastName)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Password)
                 .HasMaxLength(50)
                 .IsUnicode(false);
 
