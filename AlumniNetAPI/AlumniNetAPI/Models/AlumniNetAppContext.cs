@@ -176,9 +176,6 @@ public partial class AlumniNetAppContext : DbContext
             entity.Property(e => e.LastName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.Password)
-                .HasMaxLength(50)
-                .IsUnicode(false);
 
             entity.HasOne(d => d.Profile).WithMany(p => p.Users)
                 .HasForeignKey(d => d.ProfileId)
