@@ -5,6 +5,8 @@ namespace AlumniNetAPI.Models;
 
 public partial class User
 {
+    public bool? IsAdmin { get; set; }
+
     public string UserId { get; set; } = null!;
 
     public string FirstName { get; set; } = null!;
@@ -16,6 +18,8 @@ public partial class User
     public string? Email { get; set; }
 
     public int ProfileId { get; set; }
+
+    public virtual ICollection<InvitedUser> InvitedUsers { get; } = new List<InvitedUser>();
 
     public virtual ICollection<Post> Posts { get; } = new List<Post>();
 

@@ -16,18 +16,27 @@ namespace AlumniNetAPI.Services
 
         public async Task<string> UploadFileAsync(IFormFile file, string prefix = "", string bucketName = "alumni-app-bucket")
         {
-            var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
-            if (!bucketExists) throw new Exception($"Bucket {bucketName} does not exist.");
-            string key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{file.FileName}-{prefix?.TrimEnd('/')}";
-            var request = new PutObjectRequest()
+            try
             {
-                BucketName = bucketName,
-                Key = key,
-                InputStream = file.OpenReadStream()
-            };
-            request.Metadata.Add("Content-Type", file.ContentType);
-            await _s3Client.PutObjectAsync(request);
-            return key;
+                var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
+                if (!bucketExists) throw new Exception($"Bucket {bucketName} does not exist.");
+                string key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{file.FileName}-{prefix?.TrimEnd('/')}";
+                var request = new PutObjectRequest()
+                {
+                    BucketName = bucketName,
+                    Key = key,
+                    InputStream = file.OpenReadStream()
+                };
+                request.Metadata.Add("Content-Type", file.ContentType);
+                await _s3Client.PutObjectAsync(request);
+                return key;
+            }
+            catch (Exception ex)
+            {
+              Console.WriteLine(ex.Message);
+                return string.Empty;
+            }
+           
         }
 
         public async Task DeleteFileByKeyAsync(string key,string bucketName= "alumni-app-bucket")
