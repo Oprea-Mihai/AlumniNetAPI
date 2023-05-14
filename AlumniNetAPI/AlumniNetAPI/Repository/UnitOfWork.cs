@@ -32,7 +32,11 @@ namespace AlumniNetAPI.Repository
         private IStudyProgramRepository? _studyProgramRepository;
         public IStudyProgramRepository StudyProgramRepository => _studyProgramRepository??= new StudyProgramRepository(_context);
 
+        private IInvitedUserRepository? _invitedUserRepository;
+        private IInvitedUserRepository? InvitedUserRepository => _invitedUserRepository ??= new InvitedUserRepository(_context);
 
+
+        IEventRepository EventRepository { get; }
 
         private readonly AlumniNetAppContext _context;
 

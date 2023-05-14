@@ -19,14 +19,14 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpGet("RefuseEventInvite")]
-        public async Task<IActionResult> RefuseEventInvite()
+        public async Task<IActionResult> RefuseEventInvite(int eventId)
         {
             return Ok();
         }
 
         [Authorize]
         [HttpGet("AcceptEventInvite")]
-        public async Task<IActionResult> AcceptEventInvite()
+        public async Task<IActionResult> AcceptEventInvite(int eventId)
         {
             return Ok();
         }

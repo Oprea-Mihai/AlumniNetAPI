@@ -11,6 +11,8 @@
         IPostRepository PostRepository { get; }
         IProfileRepository ProfileRepository { get; }
         IStudyProgramRepository StudyProgramRepository { get; }
+        IInvitedUserRepository InvitedUserRepository { get; }
+        IEventRepository EventRepository { get; }
 
         Task CompleteAsync();
 

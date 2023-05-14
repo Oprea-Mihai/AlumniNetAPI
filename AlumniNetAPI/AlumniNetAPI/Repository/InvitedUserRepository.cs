@@ -1,6 +1,12 @@
-﻿namespace AlumniNetAPI.Repository
+﻿using AlumniNetAPI.Models;
+using AlumniNetAPI.Repository.Interfaces;
+
+namespace AlumniNetAPI.Repository
 {
-    public class InvitedUserRepository
+    public class InvitedUserRepository : BaseRepository<InvitedUser>, IInvitedUserRepository
     {
+        public InvitedUserRepository(AlumniNetAppContext context) : base(context)
+        {
+        }
     }
 }
