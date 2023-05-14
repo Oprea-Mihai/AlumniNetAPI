@@ -80,6 +80,25 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
+        [HttpGet("GetExperienceByProfileId")]
+        public async Task<IActionResult> GetExperienceByProfileId(int profileId)
+        {
+            try
+            {
+                List<Experience> experiences = new List<Experience>();
+                experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
+
+                List<ExperienceDTO> userExp = _mapper.Map<List<Experience>, List<ExperienceDTO>>
+                    (experiences.Where(exp => exp.ProfileId == profileId).ToList());
+                return Ok(userExp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
         [HttpPut("UpdateExperience")]
         public async Task<IActionResult> UpdateExperience([FromBody]ExperienceDTO experience)
         {

@@ -56,13 +56,15 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
-
+        [Authorize]
         [HttpGet("GetFinishedStudyByProfileId")]
-        public async Task<IActionResult> GetFinishedStudyByProfileId()
+        public async Task<IActionResult> GetFinishedStudyByProfileId(int profileId)
         {
             try
             {
-                return Ok();
+                List<FinishedStudy> studies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed()).Where(s => s.ProfileId == profileId).ToList();
+                List<FinishedStudyDetailedDTO> studiesDTO = _mapper.Map<List<FinishedStudy>, List<FinishedStudyDetailedDTO>>(studies);
+                return Ok(studiesDTO);
             }
             catch (Exception ex)
             {
