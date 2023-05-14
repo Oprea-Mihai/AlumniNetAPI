@@ -1,12 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AlumniNetAPI.Repository.Interfaces;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
 {
-    public class InvitedUserController : Controller
+    [Route("api/[controller]")]
+    public class InvitedUserController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IUnitOfWork _unitOfWork;
+        private IMapper _mapper { get; }
+
+        public InvitedUserController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            return View();
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
+        [Authorize]
+        [HttpGet("RefuseEventInvite")]
+        public async Task<IActionResult> RefuseEventInvite()
+        {
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("AcceptEventInvite")]
+        public async Task<IActionResult> AcceptEventInvite()
+        {
+            return Ok();
         }
     }
 }

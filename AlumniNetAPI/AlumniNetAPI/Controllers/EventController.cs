@@ -1,12 +1,34 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AlumniNetAPI.Repository.Interfaces;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AlumniNetAPI.Controllers
 {
-    public class EventController : Controller
+    [Route("api/[controller]")]
+    public class EventController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IUnitOfWork _unitOfWork;
+        private IMapper _mapper { get; }
+
+        public EventController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            return View();
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
+        [Authorize]
+        [HttpGet("GetAllEvents")]
+        public async Task<IActionResult> GetAllEvents()
+        {
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("GetEventsForUser")]
+        public async Task<IActionResult> GetAllEventsForUser()
+        {
+            return Ok();
         }
     }
 }
