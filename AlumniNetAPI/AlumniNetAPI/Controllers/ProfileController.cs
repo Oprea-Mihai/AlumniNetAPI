@@ -66,13 +66,45 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
+        [HttpGet("GetProfileByProfileId")]
+
+        public async Task<IActionResult> GetProfileByProfileId(int profileId)
+        {
+            try
+            {
+                ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByIdAsync(profileId));
+                return Ok(profileMapping);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
+        }
+
+        [Authorize]
+        [HttpGet("GetDescriptionAndPhotoByUserId")]
+
+        public async Task<IActionResult> GetDescriptionAndPhotoByUserId()
+        {
+            try
+            {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                UserDTO user = _mapper.Map<User, UserDTO>(await _unitOfWork.UserRepository.GetUserByIdAsync(userId));
+                ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByIdAsync(user.ProfileId));
+                return Ok(profileMapping);
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
         [HttpGet("GetProfileById")]
         public async Task<IActionResult> GetProfileById(int profileId)
         {
             try
             {
-                
-
                 UserDTO user = _mapper.Map<User, UserDTO>(await _unitOfWork.UserRepository.GetUserByProfileIdAsync(profileId));
                 ProfileDTO profileMapping = _mapper.Map<Profile, ProfileDTO>(await _unitOfWork.ProfileRepository.GetProfileByIdAsync(profileId));
                 EntireProfileDTO entireProfileDTO = new EntireProfileDTO();

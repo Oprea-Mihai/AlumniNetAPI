@@ -82,7 +82,26 @@ namespace AlumniNetAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
 
+        [Authorize]
+        [HttpGet("GetPostsBySearchUserId")]
+
+        public async Task<IActionResult> GetPostsBySearchUserId(string searchUserId)
+        {
+            try
+            {
+                List<Post> posts = new List<Post>();
+                posts = (await _unitOfWork.PostRepository.GetAllAsync()).ToList();
+
+                List<PostDTO> userPosts = _mapper.Map<List<Post>, List<PostDTO>>(posts.Where(p => p.UserId == searchUserId).OrderByDescending(post =>
+                post.PostingDate).ToList());
+                return Ok(userPosts);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [Authorize]
