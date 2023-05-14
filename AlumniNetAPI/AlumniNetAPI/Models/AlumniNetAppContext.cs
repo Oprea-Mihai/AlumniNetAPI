@@ -11,9 +11,13 @@ public partial class AlumniNetAppContext : DbContext
     private readonly IConfiguration? _configuration;
     private IDbConnection DbConnection { get; } = new SqlConnection();
 
+
+
     public AlumniNetAppContext()
     {
     }
+
+
 
     public AlumniNetAppContext(DbContextOptions<AlumniNetAppContext> options, IConfiguration configuration) : base(options)
     {
@@ -21,12 +25,15 @@ public partial class AlumniNetAppContext : DbContext
         DbConnection = new SqlConnection(this._configuration.GetConnectionString("MyContext"));
     }
 
+
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         try
         { optionsBuilder.UseSqlServer(DbConnection.ConnectionString); }
         catch (Exception e) { throw new Exception(e.Message); }
     }
+
     public virtual DbSet<Event> Events { get; set; }
 
     public virtual DbSet<Experience> Experiences { get; set; }
@@ -50,6 +57,7 @@ public partial class AlumniNetAppContext : DbContext
     public virtual DbSet<StudyProgram> StudyPrograms { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +67,9 @@ public partial class AlumniNetAppContext : DbContext
 
             entity.Property(e => e.Description)
                 .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.EventName)
+                .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.Image)
                 .HasMaxLength(50)

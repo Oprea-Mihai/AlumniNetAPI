@@ -15,5 +15,7 @@ public partial class Event
 
     public string? Image { get; set; }
 
+    public string EventName { get; set; } = null!;
+
     public virtual ICollection<InvitedUser> InvitedUsers { get; } = new List<InvitedUser>();
 }
