@@ -1,5 +1,7 @@
 ﻿using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace AlumniNetAPI.Repository
 {
@@ -8,5 +10,11 @@ namespace AlumniNetAPI.Repository
         public InvitedUserRepository(AlumniNetAppContext context) : base(context)
         {
         }
+
+        public async Task<InvitedUser> GetInvitedUserById(int id)
+        {
+            return await _dbSet.Where(i=>i.InvitedUserId==id).SingleAsync();
+        }
+
     }
 }

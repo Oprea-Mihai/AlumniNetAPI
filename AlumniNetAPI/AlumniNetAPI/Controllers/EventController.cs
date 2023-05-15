@@ -44,21 +44,21 @@ namespace AlumniNetAPI.Controllers
             {
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
-                List<int> eventIds = (await _unitOfWork.InvitedUserRepository.GetAllAsync())
-                    .Where(e => e.UserId == userId)
-                    .Select(e => e.EventId).ToList();
+                List<InvitedUser> eventInvites = (await _unitOfWork.InvitedUserRepository.GetAllAsync())
+                    .Where(e => e.UserId == userId).ToList();
 
-                List<EventDTO> userEvents = new List<EventDTO>();
+                List<EventInviteDTO> userEvents = new List<EventInviteDTO>();
 
-                foreach (int id in eventIds)
+                foreach (InvitedUser userInv in eventInvites)
                 {
-                    userEvents.Add(_mapper.Map<Event, EventDTO>
-                        (await _unitOfWork.EventRepository.GetEventByIdAsync(id)));
+                    EventInviteDTO invite = _mapper.Map<Event, EventInviteDTO>
+                        (await _unitOfWork.EventRepository.GetEventByIdAsync(userInv.EventId));
+                    invite.Status = (await _unitOfWork.StatusRepository.GetStatusById(userInv.Status)).StatusName;
+                    invite.InviteId = userInv.InvitedUserId;
+                    userEvents.Add(invite);
                 }
 
-                return Ok(userEvents);//TEST IF THIS WORKS
-                                      //CONNECT WITH CLIENT
-                                      //!REMOVE!
+                return Ok(userEvents);
             }
             catch (Exception ex)
             {

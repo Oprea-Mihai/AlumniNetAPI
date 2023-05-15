@@ -33,10 +33,13 @@ namespace AlumniNetAPI.Repository
         public IStudyProgramRepository StudyProgramRepository => _studyProgramRepository??= new StudyProgramRepository(_context);
 
         private IInvitedUserRepository? _invitedUserRepository;
-        private IInvitedUserRepository? InvitedUserRepository => _invitedUserRepository ??= new InvitedUserRepository(_context);
+        public IInvitedUserRepository? InvitedUserRepository => _invitedUserRepository ??= new InvitedUserRepository(_context);
 
+        private IEventRepository? _eventRepository;
+        public IEventRepository? EventRepository => _eventRepository ??= new EventRepository(_context);
 
-        IEventRepository EventRepository { get; }
+        private IStatusRepository? _statusRepository;
+        public IStatusRepository StatusRepository => _statusRepository ??= new StatusRepostitory(_context);
 
         private readonly AlumniNetAppContext _context;
 

@@ -1,4 +1,5 @@
-﻿using AlumniNetAPI.Repository.Interfaces;
+﻿using AlumniNetAPI.Models;
+using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +19,23 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("RefuseEventInvite")]
-        public async Task<IActionResult> RefuseEventInvite(int eventId)
+        [HttpPut("AnswerEventInvite")]
+        public async Task<IActionResult> AnswerEventInvite(int inviteId, bool answer)
         {
-            return Ok();
-        }
-
-        [Authorize]
-        [HttpGet("AcceptEventInvite")]
-        public async Task<IActionResult> AcceptEventInvite(int eventId)
-        {
-            return Ok();
-        }
+            try
+            {
+                InvitedUser invite = await _unitOfWork.InvitedUserRepository.GetInvitedUserById(inviteId);
+                string status = answer == true ? "Accepted" : "Rejected";
+                invite.Status = (await _unitOfWork.StatusRepository.GetStatusByName(status)).StatusId;
+                await _unitOfWork.InvitedUserRepository.UpdateAsync(invite);
+                await _unitOfWork.CompleteAsync();
+                return Ok("Successfuly updated");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+          
+        }        
     }
 }

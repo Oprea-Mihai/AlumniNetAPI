@@ -13,6 +13,7 @@
         IStudyProgramRepository StudyProgramRepository { get; }
         IInvitedUserRepository InvitedUserRepository { get; }
         IEventRepository EventRepository { get; }
+        IStatusRepository StatusRepository { get; }
 
         Task CompleteAsync();
 
