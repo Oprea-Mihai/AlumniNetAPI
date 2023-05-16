@@ -54,6 +54,26 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
+        [HttpPut("UserValidation")]
+
+        public async Task<IActionResult> UserValidation(string userId)
+        {
+            try
+            {
+                User userUpdate = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
+                userUpdate.IsValid = true;
+                await _unitOfWork.UserRepository.UpdateAsync(userUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok(userUpdate);
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
         [HttpGet("GetUserSearchResults")]
         public async Task<IActionResult> GetUserSearchResults(string searchedString)
         {
