@@ -58,7 +58,7 @@ public partial class AlumniNetAppContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-   
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Event>(entity =>
@@ -238,6 +238,10 @@ public partial class AlumniNetAppContext : DbContext
             entity.Property(e => e.FirstName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.Language)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasDefaultValueSql("('EN')");
             entity.Property(e => e.LastName)
                 .HasMaxLength(50)
                 .IsUnicode(false);

@@ -19,6 +19,8 @@ public partial class User
 
     public int ProfileId { get; set; }
 
+    public string Language { get; set; } = null!;
+
     public virtual ICollection<InvitedUser> InvitedUsers { get; } = new List<InvitedUser>();
 
     public virtual ICollection<Post> Posts { get; } = new List<Post>();

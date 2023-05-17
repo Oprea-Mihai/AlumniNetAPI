@@ -54,6 +54,42 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
+        [HttpGet("GetUserLanguage")]
+        public async Task<IActionResult> GetUserLanguage()
+        {
+            try
+            {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                User user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
+                return Ok(user.Language);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPut("ChangeUserLanguage")]
+        public async Task<IActionResult> ChangeUserLanguage(string language)
+        {
+            try
+            {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                User user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
+
+                user.Language = language == "Romanian" ? "RO" : "EN";
+                await _unitOfWork.UserRepository.UpdateAsync(user);
+                await _unitOfWork.CompleteAsync();
+                return Ok(user.Language);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
         [HttpGet("GetUserSearchResults")]
         public async Task<IActionResult> GetUserSearchResults(string searchedString)
         {
