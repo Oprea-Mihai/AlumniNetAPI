@@ -24,6 +24,7 @@ namespace AlumniNetAPI.Controllers
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet("GetAllPostsSorted")]
         public async Task<IActionResult> GetAllPostsSorted()
         {
