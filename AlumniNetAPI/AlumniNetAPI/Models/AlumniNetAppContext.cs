@@ -58,7 +58,6 @@ public partial class AlumniNetAppContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-  
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Event>(entity =>
@@ -239,6 +238,9 @@ public partial class AlumniNetAppContext : DbContext
             entity.ToTable("User");
 
             entity.Property(e => e.UserId)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.DeviceNotificationToken)
                 .HasMaxLength(250)
                 .IsUnicode(false);
             entity.Property(e => e.Email)

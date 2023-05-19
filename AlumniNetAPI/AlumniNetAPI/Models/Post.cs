@@ -17,5 +17,7 @@ public partial class Post
 
     public DateTime PostingDate { get; set; }
 
+    public bool IsAccepted { get; set; }
+
     public virtual User User { get; set; } = null!;
 }

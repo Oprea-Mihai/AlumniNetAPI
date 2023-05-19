@@ -48,7 +48,29 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                List<Post> posts = (await _unitOfWork.PostRepository.GetAllDetailedAsync()).ToList();
+                List<Post> posts = (await _unitOfWork.PostRepository.GetAllDetailedAsync())
+                    .Where(p => p.IsAccepted == true).ToList();
+                List<PostWithUserDataDTO> descendingOrderedPosts = _mapper.Map<List<Post>, List<PostWithUserDataDTO>>
+                    (posts.OrderByDescending(p => p.PostingDate).ToList());
+
+                List<PostWithUserDataDTO> batchToDeliver = descendingOrderedPosts.Skip(batchSize * currentIndex).Take(batchSize).ToList();
+
+                return Ok(batchToDeliver);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("GetBatchOfPostsForAdmin")]
+        public async Task<IActionResult> GetBatchOfPostsForAdmin(int batchSize, int currentIndex)
+        {
+            try
+            {
+                List<Post> posts = (await _unitOfWork.PostRepository.GetAllDetailedAsync())
+                    .Where(p => p.IsAccepted == false).ToList();
                 List<PostWithUserDataDTO> descendingOrderedPosts = _mapper.Map<List<Post>, List<PostWithUserDataDTO>>
                     (posts.OrderByDescending(p => p.PostingDate).ToList());
 
@@ -99,7 +121,8 @@ namespace AlumniNetAPI.Controllers
                 post.PostingDate).ToList());
                 return Ok(userPosts);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -142,6 +165,24 @@ namespace AlumniNetAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPut("ValidatePostById")]
+        public async Task<IActionResult> ValidatePostById(int postId, bool isValid)
+        {
+            try
+            {
+                Post post = await _unitOfWork.PostRepository.GetPostByIdAsync(postId);
+                post.IsAccepted = isValid;
+                await _unitOfWork.PostRepository.UpdateAsync(post);
+                await _unitOfWork.CompleteAsync();
+                return Ok(post.IsAccepted);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
             }
         }
 
