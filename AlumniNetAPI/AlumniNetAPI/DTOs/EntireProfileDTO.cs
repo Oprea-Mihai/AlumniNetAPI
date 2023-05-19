@@ -13,8 +13,10 @@
         public string? LastName { get; set; }
 
         public bool IsValid { get; set; }
-
-        public string? Email { get; set; }
+        public bool IsAdmin { get; set; }
+        public string? Facebook { get; set; }
+        public string? Instagram { get; set; }
+        public string? LinkedIn { get; set; }
 
         //experiences
         public List<ExperienceDTO>Experiences { get; set; }

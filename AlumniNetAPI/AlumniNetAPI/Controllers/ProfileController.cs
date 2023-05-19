@@ -38,11 +38,14 @@ namespace AlumniNetAPI.Controllers
 
                 entireProfileDTO.Description = profileMapping.Description;
                 entireProfileDTO.ProfilePicture = profileMapping.ProfilePicture;
+                entireProfileDTO.Facebook = profileMapping.Facebook;
+                entireProfileDTO.Instagram = profileMapping.Instagram;
+                entireProfileDTO.LinkedIn = profileMapping.LinkedIn;
                 entireProfileDTO.FirstName = user.FirstName;
                 entireProfileDTO.LastName = user.LastName;
-                entireProfileDTO.Email = user.Email;
                 entireProfileDTO.IsValid = user.IsValid;
-               
+                entireProfileDTO.IsAdmin = user.IsAdmin;
+
                 List<Experience> experiences = new List<Experience>();
                 experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
 
@@ -60,7 +63,7 @@ namespace AlumniNetAPI.Controllers
             }
             catch (Exception ex)
             {
-                
+
                 return BadRequest(ex.Message);
             }
         }
@@ -113,8 +116,11 @@ namespace AlumniNetAPI.Controllers
                 entireProfileDTO.ProfilePicture = profileMapping.ProfilePicture;
                 entireProfileDTO.FirstName = user.FirstName;
                 entireProfileDTO.LastName = user.LastName;
-                entireProfileDTO.Email = user.Email;
+                entireProfileDTO.IsAdmin = user.IsAdmin;
                 entireProfileDTO.IsValid = user.IsValid;
+                entireProfileDTO.Facebook = profileMapping.Facebook;
+                entireProfileDTO.Instagram = profileMapping.Instagram;
+                entireProfileDTO.LinkedIn = profileMapping.LinkedIn;
 
                 List<Experience> experiences = new List<Experience>();
                 experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
@@ -167,11 +173,11 @@ namespace AlumniNetAPI.Controllers
 
                 Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
 
-                if (profileToUpdate.ProfilePicture != null||profileToUpdate.ProfilePicture=="")
+                if (profileToUpdate.ProfilePicture != null || profileToUpdate.ProfilePicture == "")
                     await _fileStorageService.DeleteFileByKeyAsync(profileToUpdate.ProfilePicture);
 
                 string prefix = $"{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8)}";
-                string key = await _fileStorageService.UploadFileAsync(file,prefix);
+                string key = await _fileStorageService.UploadFileAsync(file, prefix);
                 profileToUpdate.ProfilePicture = key;
 
                 await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
@@ -191,9 +197,9 @@ namespace AlumniNetAPI.Controllers
             try
             {
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-               Profile profile=(await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
-                if(profile.ProfilePicture != null) 
-                await _fileStorageService.DeleteFileByKeyAsync(profile.ProfilePicture);
+                Profile profile = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
+                if (profile.ProfilePicture != null)
+                    await _fileStorageService.DeleteFileByKeyAsync(profile.ProfilePicture);
 
                 profile.ProfilePicture = null;
 
@@ -224,6 +230,28 @@ namespace AlumniNetAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [Authorize]
+        [HttpPut("UpdateSocialMediaLinksByUserId")]
+        public async Task<IActionResult> UpdateSocialMediaLinksByUserId(string instagram, string facebook, string linkedIn)
+        {
+            try
+            {
+                string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+                Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
+                profileToUpdate.Facebook = facebook;
+                profileToUpdate.LinkedIn = linkedIn;
+                profileToUpdate.Instagram = instagram;
+                await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok("Social media updated");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
         }
     }
 }
