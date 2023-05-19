@@ -44,7 +44,7 @@ namespace AlumniNetAPI.Controllers
             try
             {
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-                User user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
+                UserDTO user =_mapper.Map<User,UserDTO>( await _unitOfWork.UserRepository.GetUserByIdAsync(userId));
                 return Ok(user);
             }
             catch (Exception ex)

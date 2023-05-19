@@ -5,7 +5,7 @@ namespace AlumniNetAPI.Models;
 
 public partial class User
 {
-    public bool? IsAdmin { get; set; }
+    public bool IsAdmin { get; set; }
 
     public string UserId { get; set; } = null!;
 

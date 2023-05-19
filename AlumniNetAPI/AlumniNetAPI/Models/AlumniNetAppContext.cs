@@ -58,7 +58,7 @@ public partial class AlumniNetAppContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-
+  
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Event>(entity =>
@@ -190,6 +190,15 @@ public partial class AlumniNetAppContext : DbContext
 
             entity.Property(e => e.Description)
                 .HasMaxLength(2000)
+                .IsUnicode(false);
+            entity.Property(e => e.Facebook)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.Instagram)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.LinkedIn)
+                .HasMaxLength(250)
                 .IsUnicode(false);
         });
 

@@ -38,9 +38,13 @@ namespace AlumniNetAPI.Controllers
 
                 entireProfileDTO.Description = profileMapping.Description;
                 entireProfileDTO.ProfilePicture = profileMapping.ProfilePicture;
+                entireProfileDTO.Facebook = profileMapping.Facebook;
+                entireProfileDTO.Instagram = profileMapping.Instagram;
+                entireProfileDTO.LinkedIn = profileMapping.LinkedIn;
                 entireProfileDTO.FirstName = user.FirstName;
                 entireProfileDTO.LastName = user.LastName;
                 entireProfileDTO.IsValid = user.IsValid;
+                entireProfileDTO.IsAdmin = user.IsAdmin;
 
                 List<Experience> experiences = new List<Experience>();
                 experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
@@ -80,7 +84,11 @@ namespace AlumniNetAPI.Controllers
                 entireProfileDTO.ProfilePicture = profileMapping.ProfilePicture;
                 entireProfileDTO.FirstName = user.FirstName;
                 entireProfileDTO.LastName = user.LastName;
+                entireProfileDTO.IsAdmin = user.IsAdmin;
                 entireProfileDTO.IsValid = user.IsValid;
+                entireProfileDTO.Facebook = profileMapping.Facebook;
+                entireProfileDTO.Instagram = profileMapping.Instagram;
+                entireProfileDTO.LinkedIn = profileMapping.LinkedIn;
 
                 List<Experience> experiences = new List<Experience>();
                 experiences = (await _unitOfWork.ExperienceRepository.GetAllAsync()).ToList();
@@ -200,8 +208,12 @@ namespace AlumniNetAPI.Controllers
             {
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
                 Profile profileToUpdate = (await _unitOfWork.UserRepository.GetUserWithProfileByIdAsync(userId)).Profile;
-
-                return Ok();
+                profileToUpdate.Facebook = facebook;
+                profileToUpdate.LinkedIn = linkedIn;
+                profileToUpdate.Instagram = instagram;
+                await _unitOfWork.ProfileRepository.UpdateAsync(profileToUpdate);
+                await _unitOfWork.CompleteAsync();
+                return Ok("Social media updated");
             }
             catch (Exception ex)
             {
