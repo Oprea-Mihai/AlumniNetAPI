@@ -70,7 +70,7 @@ namespace AlumniNetAPI.Controllers
             try
             {
                 List<Post> posts = (await _unitOfWork.PostRepository.GetAllDetailedAsync())
-                    .Where(p => p.IsAccepted == false).ToList();
+                    .Where(p => p.IsAccepted is null).ToList();
                 List<PostWithUserDataDTO> descendingOrderedPosts = _mapper.Map<List<Post>, List<PostWithUserDataDTO>>
                     (posts.OrderByDescending(p => p.PostingDate).ToList());
 
