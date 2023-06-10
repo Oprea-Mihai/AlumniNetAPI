@@ -52,8 +52,7 @@ namespace AlumniNetAPI.Controllers
                      {
                          var words = faculty.FacultyName.Split(' ');
                          return words.Any(word => word.StartsWith(searchedString, StringComparison.OrdinalIgnoreCase));
-                     })
-        .ToList());
+                     }).ToList());
 
                 return Ok(faculties);
             }

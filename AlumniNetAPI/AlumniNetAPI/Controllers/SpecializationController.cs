@@ -60,8 +60,15 @@ namespace AlumniNetAPI.Controllers
             {
                 List<SpecializationDTO> specializations = _mapper.Map<List<Specialization>, List<SpecializationDTO>>
                     (await _unitOfWork.SpecializationRepository.GetSpecializationsByFacultyIdAsync(facultyId))
-                    .Where(x => x.SpecializationName.ToLower().Contains(searchedString.ToLower()))
-                    .ToList(); 
+                     .Where(x =>
+                     {
+                         var words = x.SpecializationName.Split(' ');
+                         return words.Any(word => word.StartsWith(searchedString, StringComparison.OrdinalIgnoreCase));
+                     })
+                    .ToList();
+
+
+
                 return Ok(specializations);
             }
             catch (Exception ex)
