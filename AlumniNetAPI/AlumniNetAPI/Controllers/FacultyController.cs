@@ -48,8 +48,12 @@ namespace AlumniNetAPI.Controllers
 
                 faculties = _mapper.Map<List<Faculty>, List<FacultyDTO>>
                     ((await _unitOfWork.FacultyRepository.GetAllAsync())
-                    .Where(x => x.FacultyName.ToLower().Contains(searchedString.ToLower()))
-                    .ToList());
+                    .Where(faculty =>
+                     {
+                         var words = faculty.FacultyName.Split(' ');
+                         return words.Any(word => word.StartsWith(searchedString, StringComparison.OrdinalIgnoreCase));
+                     })
+        .ToList());
 
                 return Ok(faculties);
             }

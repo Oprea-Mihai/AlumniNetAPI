@@ -44,7 +44,7 @@ namespace AlumniNetAPI.Controllers
             try
             {
                 string? userId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-                UserDTO user =_mapper.Map<User,UserDTO>( await _unitOfWork.UserRepository.GetUserByIdAsync(userId));
+                UserDTO user = _mapper.Map<User, UserDTO>(await _unitOfWork.UserRepository.GetUserByIdAsync(userId));
                 return Ok(user);
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ namespace AlumniNetAPI.Controllers
                 return Ok(userUpdate);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -117,8 +117,8 @@ namespace AlumniNetAPI.Controllers
             {
                 List<UserSearchResultDTO> users =
                     (await _unitOfWork.UserRepository.GetAllAsync())
-                    .Where(x => x.FirstName.ToLower().StartsWith(searchedString.ToLower())
-                    || x.LastName.ToLower().StartsWith(searchedString.ToLower())
+                    .Where(x => x.FirstName.StartsWith(searchedString, StringComparison.OrdinalIgnoreCase)
+                    || x.LastName.StartsWith(searchedString, StringComparison.OrdinalIgnoreCase)
                     && x.IsValid == true)
                      .Select(x => new UserSearchResultDTO
                      {
