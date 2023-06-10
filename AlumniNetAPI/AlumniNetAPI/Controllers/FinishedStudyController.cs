@@ -146,7 +146,7 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                FinishedStudy toDelete=await _unitOfWork.FinishedStudyRepository.GetFinishedStudyByIdAsync(id);
+                FinishedStudy toDelete = await _unitOfWork.FinishedStudyRepository.GetFinishedStudyByIdAsync(id);
                 await _unitOfWork.FinishedStudyRepository.DeleteAsync(toDelete);
                 await _unitOfWork.CompleteAsync();
                 return Ok(true);
@@ -157,6 +157,23 @@ namespace AlumniNetAPI.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("GetAllFinishingYears")]
+        public async Task<IActionResult> GetAllFinishingYears()
+        {
+            try
+            {
+                List<int> allYears = (await _unitOfWork.FinishedStudyRepository.GetAllAsync())
+                    .Select(x => x.Year)
+                    .Distinct()
+                    .ToList();
+                return Ok(allYears);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
 
     }
 }

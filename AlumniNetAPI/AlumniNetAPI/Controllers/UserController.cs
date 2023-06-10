@@ -117,8 +117,8 @@ namespace AlumniNetAPI.Controllers
             {
                 List<UserSearchResultDTO> users =
                     (await _unitOfWork.UserRepository.GetAllAsync())
-                    .Where(x => x.FirstName.ToLower().Contains(searchedString.ToLower())
-                    || x.LastName.ToLower().Contains(searchedString.ToLower())
+                    .Where(x => x.FirstName.ToLower().StartsWith(searchedString.ToLower())
+                    || x.LastName.ToLower().StartsWith(searchedString.ToLower())
                     && x.IsValid == true)
                      .Select(x => new UserSearchResultDTO
                      {
