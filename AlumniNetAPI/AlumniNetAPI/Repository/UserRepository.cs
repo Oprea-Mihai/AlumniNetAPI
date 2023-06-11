@@ -29,5 +29,7 @@ namespace AlumniNetAPI.Repository
             User user = await _dbSet.SingleAsync(u => u.ProfileId == id);
             return user;
         }
+
+       
     }
 }

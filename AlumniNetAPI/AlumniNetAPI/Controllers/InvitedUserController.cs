@@ -1,6 +1,7 @@
 ﻿using AlumniNetAPI.Models;
 using AlumniNetAPI.Repository.Interfaces;
 using AutoMapper;
+using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,7 +58,7 @@ namespace AlumniNetAPI.Controllers
                     await _unitOfWork.InvitedUserRepository.AddAsync(invitedUser);
                 }
                 await _unitOfWork.CompleteAsync();
-                return Ok();
+                return Ok("Invites sent");
             }
             catch (Exception ex)
             {
@@ -67,11 +68,27 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpPost("SendInvitesByYear")]
-        public async Task<IActionResult> SendInvitesByYear(int eventId)
+        public async Task<IActionResult> SendInvitesByYear(int eventId, List<int> years)
         {
             try
             {
-                return Ok();
+                var finishedStudies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed())
+                    .Where(x => years.Contains(x.Year));
+
+                if (finishedStudies.Any())
+                {
+                    foreach (FinishedStudy fs in finishedStudies)
+                    {
+                        InvitedUser userInvite = new InvitedUser();
+                        string userId = (await _unitOfWork.UserRepository.GetUserByProfileIdAsync(fs.ProfileId)).UserId;
+                        userInvite.EventId = eventId;
+                        userInvite.UserId = userId;
+                        userInvite.Status = 1;
+                        await _unitOfWork.InvitedUserRepository.AddAsync(userInvite);
+                    }
+                }
+                await _unitOfWork.CompleteAsync();
+                return Ok("Invites sent");
             }
             catch (Exception ex)
             {
@@ -81,10 +98,26 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpPost("SendInvitesByFaculty")]
-        public async Task<IActionResult> SendInvitesByFaculty(int eventId,List<int>facultyIDs)
+        public async Task<IActionResult> SendInvitesByFaculty(int eventId, List<int> facultyIDs)
         {
             try
             {
+
+                var finishedStudies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed())
+                    .Where(x => facultyIDs.Contains(x.Specialization.FacultyId));
+                if (finishedStudies.Any())
+                {
+                    foreach (FinishedStudy fs in finishedStudies)
+                    {
+                        InvitedUser userInvite = new InvitedUser();
+                        string userId = (await _unitOfWork.UserRepository.GetUserByProfileIdAsync(fs.ProfileId)).UserId;
+                        userInvite.EventId = eventId;
+                        userInvite.UserId = userId;
+                        userInvite.Status = 1;
+                        await _unitOfWork.InvitedUserRepository.AddAsync(userInvite);
+                    }
+                }
+                await _unitOfWork.CompleteAsync();
                 return Ok();
             }
             catch (Exception ex)
@@ -95,11 +128,28 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpPost("SendInvitesByFacultyAndYear")]
-        public async Task<IActionResult> SendInvitesByFacultyAndYear(int eventId)
+        public async Task<IActionResult> SendInvitesByFacultyAndYear(int eventId, List<int> facultyIDs, List<int> years)
         {
             try
             {
-                return Ok();
+
+                var finishedStudies = (await _unitOfWork.FinishedStudyRepository.GetAllDetailed())
+                    .Where(x => facultyIDs.Contains(x.Specialization.FacultyId) && years.Contains(x.Year));
+
+                if (finishedStudies.Any())
+                {
+                    foreach (FinishedStudy fs in finishedStudies)
+                    {
+                        InvitedUser userInvite = new InvitedUser();
+                        string userId = (await _unitOfWork.UserRepository.GetUserByProfileIdAsync(fs.ProfileId)).UserId;
+                        userInvite.EventId = eventId;
+                        userInvite.UserId = userId;
+                        userInvite.Status = 1;
+                        await _unitOfWork.InvitedUserRepository.AddAsync(userInvite);
+                    }
+                }
+                await _unitOfWork.CompleteAsync();
+                return Ok("Invites sent");
             }
             catch (Exception ex)
             {
@@ -113,7 +163,7 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                return Ok();
+                return Ok("Invites sent");
             }
             catch (Exception ex)
             {
