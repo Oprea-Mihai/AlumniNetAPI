@@ -32,7 +32,8 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                List<Event> events = (await _unitOfWork.EventRepository.GetAllAsync()).ToList();
+                List<EventDTO> events =_mapper.Map<List<Event>,List<EventDTO>> 
+                    ((await _unitOfWork.EventRepository.GetAllAsync()).ToList());
                 return Ok(events);
             }
             catch (Exception ex)
@@ -44,7 +45,7 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpGet("GetEventsForUser")]
-        public async Task<IActionResult> GetAllEventsForUser()
+        public async Task<IActionResult> GetEventsForUser()
         {
             try
             {
