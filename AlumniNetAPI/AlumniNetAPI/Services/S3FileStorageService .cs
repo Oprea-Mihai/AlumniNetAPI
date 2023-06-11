@@ -19,7 +19,8 @@ namespace AlumniNetAPI.Services
             try
             {
                 var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
-                if (!bucketExists) throw new Exception($"Bucket {bucketName} does not exist.");
+                if (!bucketExists) 
+                    throw new Exception($"Bucket {bucketName} does not exist.");
                 string key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{file.FileName}-{prefix?.TrimEnd('/')}";
                 var request = new PutObjectRequest()
                 {

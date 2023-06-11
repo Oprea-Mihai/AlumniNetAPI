@@ -9,8 +9,8 @@ namespace AlumniNetAPI.MappingProfiles
     {
         public EventMapper()
         {
-            CreateMap<Event, EventInviteDTO>();
-            CreateMap<EventInviteDTO, Event>();
+            CreateMap<Event, EventDTO>();
+            CreateMap<EventDTO, Event>();
         }
     }
 }
