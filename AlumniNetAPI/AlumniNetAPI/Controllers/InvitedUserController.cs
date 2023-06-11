@@ -81,7 +81,7 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpPost("SendInvitesByFaculty")]
-        public async Task<IActionResult> SendInvitesByFaculty(int eventId)
+        public async Task<IActionResult> SendInvitesByFaculty(int eventId,List<int>facultyIDs)
         {
             try
             {
