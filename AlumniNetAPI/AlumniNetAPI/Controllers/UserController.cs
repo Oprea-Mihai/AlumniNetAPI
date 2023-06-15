@@ -117,9 +117,14 @@ namespace AlumniNetAPI.Controllers
             {
                 List<UserSearchResultDTO> users =
                     (await _unitOfWork.UserRepository.GetAllAsync())
-                    .Where(x => x.FirstName.StartsWith(searchedString, StringComparison.OrdinalIgnoreCase)
-                    || x.LastName.StartsWith(searchedString, StringComparison.OrdinalIgnoreCase)
-                    && x.IsValid == true)
+                    .Where(x =>
+                    {
+                        var words = searchedString.Split(' ');
+                        return words.Any(word =>
+                            x.FirstName.StartsWith(word, StringComparison.OrdinalIgnoreCase)
+                            || x.LastName.StartsWith(word, StringComparison.OrdinalIgnoreCase))
+                            && x.IsValid == true;
+                    })
                      .Select(x => new UserSearchResultDTO
                      {
                          ProfileId = x.ProfileId,
