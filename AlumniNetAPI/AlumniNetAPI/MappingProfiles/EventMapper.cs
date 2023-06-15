@@ -1,6 +1,7 @@
 ﻿using AlumniNetAPI.DTOs;
 using AlumniNetAPI.Models;
 using AutoMapper;
+using Google.Apis.Util;
 using Profile = AutoMapper.Profile;
 
 namespace AlumniNetAPI.MappingProfiles
@@ -14,6 +15,12 @@ namespace AlumniNetAPI.MappingProfiles
 
             CreateMap<Event, EventInviteDTO>();
             CreateMap<EventInviteDTO, Event>();
+
+            CreateMap<Event, EventWithResultsDTO>()
+                .ForMember(dest => dest.Accepted, opt => opt.Ignore())
+                .ForMember(dest => dest.Pending, opt => opt.Ignore())
+                .ForMember(dest => dest.Rejected, opt => opt.Ignore());
+            CreateMap<EventWithResultsDTO, Event>();
         }
     }
 }

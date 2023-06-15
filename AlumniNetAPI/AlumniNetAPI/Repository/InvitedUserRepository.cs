@@ -13,7 +13,12 @@ namespace AlumniNetAPI.Repository
 
         public async Task<InvitedUser> GetInvitedUserById(int id)
         {
-            return await _dbSet.Where(i=>i.InvitedUserId==id).SingleAsync();
+            return await _dbSet.Where(i => i.InvitedUserId == id).SingleAsync();
+        }
+
+        public async Task<List<InvitedUser>> GetInvitationsByEventId(int id)
+        {
+            return await _dbSet.Where(i => i.EventId == id).ToListAsync();
         }
 
     }

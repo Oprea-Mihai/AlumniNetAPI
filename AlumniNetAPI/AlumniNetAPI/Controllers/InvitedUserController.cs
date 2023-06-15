@@ -170,5 +170,7 @@ namespace AlumniNetAPI.Controllers
                 return BadRequest(ex);
             }
         }
+
+        
     }
 }

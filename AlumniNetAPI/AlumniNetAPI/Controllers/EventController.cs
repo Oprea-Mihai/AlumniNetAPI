@@ -32,7 +32,7 @@ namespace AlumniNetAPI.Controllers
         {
             try
             {
-                List<EventDTO> events =_mapper.Map<List<Event>,List<EventDTO>> 
+                List<EventDTO> events = _mapper.Map<List<Event>, List<EventDTO>>
                     ((await _unitOfWork.EventRepository.GetAllAsync()).ToList());
                 return Ok(events);
             }
@@ -40,7 +40,35 @@ namespace AlumniNetAPI.Controllers
             {
                 return BadRequest(ex);
             }
+        }
 
+        [Authorize]
+        [HttpGet("GetAllEventsWithInviteResults")]
+        public async Task<IActionResult> GetAllEventsWithInviteResults()
+        {
+            try
+            {
+                List<EventWithResultsDTO> eventsWithResults = _mapper.Map<List<Event>, List<EventWithResultsDTO>>
+                    ((await _unitOfWork.EventRepository.GetAllAsync()).ToList());
+
+
+
+                foreach (EventWithResultsDTO element in eventsWithResults)
+                {
+                    var eventInvites = await _unitOfWork.InvitedUserRepository.
+                        GetInvitationsByEventId(element.EventId);
+
+                    element.Pending = eventInvites.Count(x=>x.Status==1);
+                    element.Accepted = eventInvites.Count(x=>x.Status==2);
+                    element.Rejected = eventInvites.Count(x=>x.Status==3);
+
+                }
+                return Ok(eventsWithResults);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         [Authorize]
@@ -75,14 +103,14 @@ namespace AlumniNetAPI.Controllers
 
         [Authorize]
         [HttpPost("CreateEvent")]
-        public async Task<IActionResult>CreateEvent([FromBody]EventDTO newEvent)
+        public async Task<IActionResult> CreateEvent([FromBody] EventDTO newEvent)
         {
             try
             {
                 string? username = User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
 
                 newEvent.Initiator = username;
-                Event ev=_mapper.Map<EventDTO,Event>(newEvent);
+                Event ev = _mapper.Map<EventDTO, Event>(newEvent);
                 await _unitOfWork.EventRepository.AddAsync(ev);
                 await _unitOfWork.CompleteAsync();
                 return Ok(ev.EventId);
@@ -101,7 +129,7 @@ namespace AlumniNetAPI.Controllers
             {
                 if (file.Length == 0)
                     return BadRequest("Empty file!");
-               
+
                 string prefix = $"{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8)}";
                 string key = await _fileStorageService.UploadFileAsync(file, prefix);
 
