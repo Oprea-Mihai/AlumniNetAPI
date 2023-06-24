@@ -133,6 +133,9 @@ namespace AlumniNetAPI.Controllers
                      })
                      .ToList();
 
+                if (users.Count == 0)
+                    return Ok(users);
+
                 foreach (var user in users)
                 {
                     Models.Profile profile = await _unitOfWork.ProfileRepository.GetProfileWithStudiesByIdAsync(user.ProfileId);
@@ -140,7 +143,7 @@ namespace AlumniNetAPI.Controllers
                     user.FacultyName = profile.FinishedStudies.First().Specialization.Faculty.FacultyName;
                     user.GraduationYear = profile.FinishedStudies.First().Year;
                 }
-
+                users.OrderBy(x=>x.LastName);
                 return Ok(users);
             }
             catch (Exception ex)
