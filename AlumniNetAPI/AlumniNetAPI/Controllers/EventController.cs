@@ -140,5 +140,31 @@ namespace AlumniNetAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [Authorize]
+        [HttpDelete("DeleteEvent")]
+        public async Task<IActionResult> DeleteEvent(int eventId)
+        {
+
+            try
+            {
+                List<InvitedUser> invites = await _unitOfWork.InvitedUserRepository.GetInvitationsByEventId(eventId);
+                foreach (InvitedUser invite in invites)
+                    await _unitOfWork.InvitedUserRepository.DeleteAsync(invite);
+
+                Event eventToDelete = await _unitOfWork.EventRepository.GetEventByIdAsync(eventId);
+                await _unitOfWork.EventRepository.DeleteAsync(eventToDelete);
+
+                await _unitOfWork.CompleteAsync();
+
+                return Ok("Event successfully deleted");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
+        }
+
     }
 }
