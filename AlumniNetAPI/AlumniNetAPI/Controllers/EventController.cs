@@ -122,6 +122,26 @@ namespace AlumniNetAPI.Controllers
         }
 
         [Authorize]
+        [HttpPut("UpdateEvent")]
+        public async Task<IActionResult> UpdateEvent([FromBody] EventDTO eventToUpdate)
+        {
+            try
+            {
+                string? username = User.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+
+                eventToUpdate.Initiator = username;
+                Event ev = _mapper.Map<EventDTO, Event>(eventToUpdate);
+                await _unitOfWork.EventRepository.UpdateAsync(ev);
+                await _unitOfWork.CompleteAsync();
+                return Ok(ev.EventId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [Authorize]
         [HttpPut("UploadEventImage")]
         public async Task<IActionResult> UploadEventImage(IFormFile file)
         {
