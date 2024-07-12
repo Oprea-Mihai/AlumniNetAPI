@@ -61,9 +61,6 @@ The structure of this API follows the MVC pattern, clearly separating responsibi
 - **Firebase**: Authentication and authorization.
 - **AWS S3**: File storage service.
 
-## Contact
-
-If you have any questions, suggestions, or feedback, feel free to contact us at api-support@university.edu.
 
 ---
 
